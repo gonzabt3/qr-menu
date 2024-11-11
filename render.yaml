@@ -1,7 +1,7 @@
 databases:
-  - name: qr-menu
+  - name: qr_menu_test
     databaseName: qr-menu-development
-    user: gonzalo.muscolo@gmail.com
+    user: qr_menu_test_user
     plan: free
 
 services:
