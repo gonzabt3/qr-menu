@@ -1,6 +1,6 @@
 databases:
   - name: qr_menu_test
-    databaseName: qr-menu-development
+    databaseName: qr_menu_test
     user: qr_menu_test_user
     plan: free
 
