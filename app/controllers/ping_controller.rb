@@ -1,6 +1,8 @@
 # app/controllers/ping_controller.rb
 class PingController < ApplicationController
+  before_action :authorize
+
   def index
-    render json: { message: "pong #{ENV['CORS_ALLOWED_ORIGINS']}" }
+    render json: { message: "holaaa" }
   end
 end

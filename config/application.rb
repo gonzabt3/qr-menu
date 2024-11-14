@@ -23,7 +23,12 @@ module QrMenu
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-
+    # Configuraciones de Auth0
+    config.auth0 = ActiveSupport::OrderedOptions.new
+    config.auth0.client_id = ENV['AUTH0_CLIENT_ID']
+    config.auth0.client_secret = ENV['AUTH0_CLIENT_SECRET']
+    config.auth0.domain = ENV['AUTH0_DOMAIN']
+    config.auth0.audience = ENV['AUTH0_AUDIENCE']
     # Only loads a smaller set of middleware suitable for API only apps.
     # Middleware like session, flash, cookies can be added back manually.
     # Skip views, helpers and assets when generating a new resource.
