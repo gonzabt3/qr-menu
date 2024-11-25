@@ -19,13 +19,12 @@ module Secured
   }.freeze
 
   def authorize
-    byebug
     token = token_from_request
 
     return if performed?
 
     validation_response = Auth0Client.validate_token(token)
-    print "asd"
+
     @decoded_token = validation_response.decoded_token
     print @decoded_token
     return unless (error = validation_response.error)
@@ -43,22 +42,17 @@ module Secured
   private
 
   def token_from_request
-    print request.headers['Authorization']
     authorization_header_elements = request.headers['Authorization']&.split
-    scheme, token = authorization_header_elements
-    return token
-    print authorization_header_elements
+
     render json: REQUIRES_AUTHENTICATION, status: :unauthorized and return unless authorization_header_elements
 
     unless authorization_header_elements.length == 2
-      render json: MALFORMED_AUTHORIZATION_HEADER,
-             status: :unauthorized and return
+      render json: MALFORMED_AUTHORIZATION_HEADER, status: :unauthorized and return
     end
 
     scheme, token = authorization_header_elements
-    print scheme.downcase != 'bearer'
-    print 'gonza'
-    render json: BAD_CREDENTIALS, status: :unauthorized and return if scheme.downcase != 'bearer'
+
+    render json: BAD_CREDENTIALS, status: :unauthorized and return unless scheme.downcase == 'bearer'
 
     token
   end
