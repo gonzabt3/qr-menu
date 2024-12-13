@@ -26,7 +26,7 @@ module Secured
     validation_response = Auth0Client.validate_token(token)
 
     @decoded_token = validation_response.decoded_token
-    print @decoded_token
+    @current_user = @decoded_token.token[0]
     return unless (error = validation_response.error)
 
     render json: { message: error.message }, status: error.status
