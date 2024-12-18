@@ -30,6 +30,7 @@ class UsersController < ApplicationController
   def update
     user = User.find_by(auth0_id: params[:id])
     if user.update(user_params)
+      user.update({ first_time: false })
       render json: user, status: :ok
     else
       render json: user.errors, status: :unprocessable_entity
