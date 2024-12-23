@@ -26,7 +26,12 @@ module Secured
     validation_response = Auth0Client.validate_token(token)
 
     @decoded_token = validation_response.decoded_token
-    @current_user = @decoded_token.token[0]
+    email_user = @decoded_token.token[0]["https://qr-menu.io/claims/email"]
+    @current_user = User.find_by(email: email_user)
+    if @current_user.nil?
+      User.create(email: email_user)
+      @current_user = User.find_by(email: email_user)
+    end
     return unless (error = validation_response.error)
 
     render json: { message: error.message }, status: error.status
@@ -37,6 +42,10 @@ module Secured
     return yield if @decoded_token.validate_permissions(permissions)
 
     render json: INSUFFICIENT_PERMISSIONS, status: :forbidden
+  end
+
+  def current_user
+    @current_user
   end
 
   private

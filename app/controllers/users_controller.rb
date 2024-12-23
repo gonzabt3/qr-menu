@@ -12,10 +12,7 @@ class UsersController < ApplicationController
   end
 
   def check_first_login
-    user_id = @current_user["sub"].split("|").last
-    email = @current_user["https://qr-menu.io/claims/email"]
-
-    user = User.find_by(auth0_id: user_id)
+    user = @current_user
 
     if user.nil?
       # Si el usuario no existe en la base de datos, es la primera vez que entra

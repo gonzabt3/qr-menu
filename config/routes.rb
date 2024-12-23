@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
   get '/ping', to: 'ping#index'  # Ruta para el endpoint de ping
   get 'check_first_login', to: 'users#check_first_login'
-  resources :users, only: [:create, :update]
-
-  # Defines the root path route ("/")
-  # root "posts#index"
+  resources :users, only: [:create, :update] do
+    get 'restaurants', to: 'restaurants#index_by_email', on: :member, constraints: { id: /.*/ }
+  end
+  resources :restaurants, only: [:index, :create,:update, :destroy]
 end
