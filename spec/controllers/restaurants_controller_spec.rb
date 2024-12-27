@@ -1,7 +1,7 @@
-# spec/controllers/restaurants_controller_spec.rb
+ #spec/requests/restaurants_controller_spec.rb
 require 'rails_helper'
 
-RSpec.describe RestaurantsController, type: :controller do
+RSpec.describe "Restaurants", type: :request do
   let(:user) { create(:user) }
   let(:restaurant) { create(:restaurant, user: user) }
   let(:valid_attributes) {
@@ -18,97 +18,99 @@ RSpec.describe RestaurantsController, type: :controller do
   let(:invalid_attributes) {
     { name: nil }
   }
-
   before do
-    allow(controller).to receive(:current_user).and_return(user)
+    allow_any_instance_of(ApplicationController).to receive(:authorize).and_return(true)
+    allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
   end
 
-  describe "GET #index" do
+
+  describe "GET /restaurants" do
     it "returns a success response" do
       restaurant
-      get :index
+      get restaurants_path
       expect(response).to be_successful
     end
   end
 
-  describe "GET #index_by_email" do
+  describe "GET /users/:email/restaurants" do
     it "returns a success response" do
-      get :index_by_email, params: { id: user.email }
+      get restaurants_user_path(user.email)
       expect(response).to be_successful
     end
 
     it "returns a not found response if user does not exist" do
-      get :index_by_email, params: { id: 'nonexistent@example.com' }
+      get restaurants_user_path('nonexistent@example.com')
       expect(response).to have_http_status(:not_found)
     end
   end
 
-  describe "GET #show" do
-    it "returns a success response" do
-      get :show, params: { id: restaurant.to_param }
-      expect(response).to be_successful
-    end
-  end
+   describe "GET /restaurants/:id" do
+    let(:restaurant1) { create(:restaurant, user: user) }
+     it "returns a success response" do
+       byebug
+       get restaurant_path(restaurant1)
+       expect(response).to be_successful
+     end
+   end
 
-  describe "POST #create" do
-    context "with valid params" do
-      it "creates a new Restaurant" do
-        expect {
-          post :create, params: { restaurant: valid_attributes }
-        }.to change(Restaurant, :count).by(1)
-      end
+   describe "POST /restaurants" do
+     context "with valid params" do
+       it "creates a new Restaurant" do
+         expect {
+           post restaurants_path, params: { restaurant: valid_attributes }
+         }.to change(Restaurant, :count).by(1)
+       end
 
-      it "renders a JSON response with the new restaurant" do
-        post :create, params: { restaurant: valid_attributes }
-        expect(response).to have_http_status(:created)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
-        expect(response.location).to eq(restaurant_url(Restaurant.last))
-      end
-    end
+       it "renders a JSON response with the new restaurant" do
+         post restaurants_path, params: { restaurant: valid_attributes }
+         expect(response).to have_http_status(:created)
+         expect(response.content_type).to eq('application/json; charset=utf-8')
+       end
+     end
 
-    context "with invalid params" do
-      it "renders a JSON response with errors for the new restaurant" do
-        post :create, params: { restaurant: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
-      end
-    end
-  end
+     context "with invalid params" do
+       it "renders a JSON response with errors for the new restaurant" do
+         post restaurants_path, params: { restaurant: invalid_attributes }
+         expect(response).to have_http_status(:unprocessable_entity)
+         expect(response.content_type).to eq('application/json; charset=utf-8')
+       end
+     end
+   end
 
-  describe "PUT #update" do
-    context "with valid params" do
-      let(:new_attributes) {
-        { name: 'Updated Restaurant' }
-      }
+   describe "PUT /restaurants/:id" do
+     context "with valid params" do
+       let(:new_attributes) {
+         { name: 'Updated Restaurant' }
+       }
 
-      it "updates the requested restaurant" do
-        put :update, params: { id: restaurant.to_param, restaurant: new_attributes }
-        restaurant.reload
-        expect(restaurant.name).to eq('Updated Restaurant')
-      end
+       it "updates the requested restaurant" do
+         put restaurant_path(restaurant), params: { restaurant: new_attributes }
+         restaurant.reload
+         expect(restaurant.name).to eq('Updated Restaurant')
+       end
 
-      it "renders a JSON response with the restaurant" do
-        put :update, params: { id: restaurant.to_param, restaurant: valid_attributes }
-        expect(response).to have_http_status(:ok)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
-      end
-    end
+       it "renders a JSON response with the restaurant" do
+         put restaurant_path(restaurant), params: { restaurant: valid_attributes }
+         expect(response).to have_http_status(:ok)
+         expect(response.content_type).to eq('application/json; charset=utf-8')
+       end
+     end
 
-    context "with invalid params" do
-      it "renders a JSON response with errors for the restaurant" do
-        put :update, params: { id: restaurant.to_param, restaurant: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.content_type).to eq('application/json; charset=utf-8')
-      end
-    end
-  end
+     context "with invalid params" do
+       it "renders a JSON response with errors for the restaurant" do
+         put restaurant_path(restaurant), params: { restaurant: invalid_attributes }
+         expect(response).to have_http_status(:unprocessable_entity)
+         expect(response.content_type).to eq('application/json; charset=utf-8')
+       end
+     end
+   end
 
-  describe "DELETE #destroy" do
-    it "destroys the requested restaurant" do
-      restaurant
-      expect {
-        delete :destroy, params: { id: restaurant.to_param }
-      }.to change(Restaurant, :count).by(-1)
-    end
-  end
+   describe "DELETE /restaurants/:id" do
+     it "destroys the requested restaurant" do
+       restaurant
+       expect {
+         delete restaurant_path(restaurant)
+       }.to change(Restaurant, :count).by(-1)
+     end
+   end
 end

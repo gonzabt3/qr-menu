@@ -52,6 +52,7 @@ class RestaurantsController < ApplicationController
   private
 
   def set_restaurant
+    byebug
     @restaurant = current_user.restaurants.find(params[:id])
   end
 
