@@ -10,6 +10,8 @@ Rails.application.routes.draw do
     get 'restaurants', to: 'restaurants#index_by_email', on: :member, constraints: { id: /.*/ }
   end
   resources :restaurants, only: %i[index show create update destroy] do
-    resources :menus, only: %i[index show create update destroy]
+    resources :menus, only: %i[index show create update destroy] do
+      resources :sections, only: %i[index show create update destroy]
+    end
   end
 end
