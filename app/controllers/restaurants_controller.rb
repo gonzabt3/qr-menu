@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RestaurantsController < ApplicationController
   before_action :set_restaurant, only: %i[show update destroy]
   before_action :authorize
