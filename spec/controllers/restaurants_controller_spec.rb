@@ -3,6 +3,7 @@ require 'rails_helper'
 
 RSpec.describe 'Restaurants', type: :request do
   let(:user) { create(:user) }
+  let(:other_user) { create(:user, email: 'other@example.com') }
   let(:restaurant) { create(:restaurant, user: user) }
   let(:valid_attributes) do
     {
@@ -99,6 +100,17 @@ RSpec.describe 'Restaurants', type: :request do
         put restaurant_path(restaurant), params: { restaurant: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
+      end
+    end
+
+    context 'when the user is not the owner' do
+      before do
+        allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(other_user)
+      end
+
+      it 'returns a forbidden response' do
+        put restaurant_path(restaurant), params: { restaurant: valid_attributes }
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end

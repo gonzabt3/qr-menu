@@ -1,10 +1,11 @@
 class RestaurantsController < ApplicationController
-  before_action :set_restaurant, only: [:show, :update, :destroy]
+  before_action :set_restaurant, only: %i[show update destroy]
   before_action :authorize
+  before_action :authorize_restaurant_owner, only: %i[update destroy]
 
   # GET /restaurants
   def index
-    @restaurants = current_user.restaurants
+    @restaurants = Restaurant.all
     render json: @restaurants
   end
 
@@ -52,11 +53,16 @@ class RestaurantsController < ApplicationController
   private
 
   def set_restaurant
-    byebug
-    @restaurant = current_user.restaurants.find(params[:id])
+    @restaurant = Restaurant.find(params[:id])
   end
 
   def restaurant_params
     params.require(:restaurant).permit(:name, :address, :phone, :email, :website, :instagram, :description)
+  end
+
+  def authorize_restaurant_owner
+    return if @restaurant.user == current_user
+
+    render json: { error: 'You are not authorized to perform this action' }, status: :forbidden
   end
 end

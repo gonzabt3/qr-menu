@@ -3,11 +3,11 @@ Rails.application.routes.draw do
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
-  get "up" => "rails/health#show", as: :rails_health_check
-  get '/ping', to: 'ping#index'  # Ruta para el endpoint de ping
+  get 'up' => 'rails/health#show', as: :rails_health_check
+  get '/ping', to: 'ping#index' # Ruta para el endpoint de ping
   get 'check_first_login', to: 'users#check_first_login'
-  resources :users, only: [:create, :update] do
+  resources :users, only: %i[create update] do
     get 'restaurants', to: 'restaurants#index_by_email', on: :member, constraints: { id: /.*/ }
   end
-  resources :restaurants, only: [:index, :create,:update, :destroy]
+  resources :restaurants, only: %i[index show create update destroy]
 end
