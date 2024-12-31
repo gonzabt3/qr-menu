@@ -1,4 +1,4 @@
-#frozen_string_literal: true
+# frozen_string_literal: true
 
 module Secured
   extend ActiveSupport::Concern
@@ -26,7 +26,7 @@ module Secured
     validation_response = Auth0Client.validate_token(token)
 
     @decoded_token = validation_response.decoded_token
-    email_user = @decoded_token.token[0]["https://qr-menu.io/claims/email"]
+    email_user = @decoded_token.token[0]['https://qr-menu.io/claims/email']
     @current_user = User.find_by(email: email_user)
     if @current_user.nil?
       User.create(email: email_user)
