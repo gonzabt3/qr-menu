@@ -23,6 +23,13 @@ RSpec.describe 'Products', type: :request do
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
   end
 
+  describe 'GET /restaurants/:restaurant_id/menus/:menu_id/products' do
+    it 'returns a success response' do
+      get restaurant_menu_products_path(restaurant, menu)
+      expect(response).to be_successful
+    end
+  end
+
   describe 'GET /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products' do
     it 'returns a success response' do
       get restaurant_menu_section_products_path(restaurant, menu, section)

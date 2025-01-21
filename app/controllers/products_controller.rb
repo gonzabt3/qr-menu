@@ -1,13 +1,19 @@
 class ProductsController < ApplicationController
   before_action :set_restaurant
   before_action :set_menu
-  before_action :set_section
+  before_action :set_section, except: %i[index_by_menu]
   before_action :set_product, only: %i[show update destroy]
   before_action :authorize
 
   # GET /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products
   def index
     @products = @section.products
+    render json: @products
+  end
+
+  # GET /restaurants/:restaurant_id/menus/:menu_id/products
+  def index_by_menu
+    @products = @menu.sections.includes(:products).map(&:products).flatten
     render json: @products
   end
 
