@@ -24,6 +24,7 @@ class ProductsController < ApplicationController
 
   # POST /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products
   def create
+    byebug
     @product = @section.products.build(product_params)
 
     if @product.save
@@ -66,7 +67,8 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.require(:product).permit(:name, :description, :price)
+    #tddo agregar image to schema
+    params.permit(:name, :description, :price, :image)
   end
 
   def authorize_restaurant_owner
