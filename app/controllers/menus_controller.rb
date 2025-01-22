@@ -4,7 +4,7 @@
 class MenusController < ApplicationController
   before_action :set_restaurant, except: %i[show_by_name]
   before_action :set_menu, only: %i[show update destroy]
-  before_action :authorize
+  before_action :authorize, except: %i[show_by_name]
   before_action :authorize_restaurant_owner, only: %i[create update destroy], except: %i[show_by_name]
 
   # GET /restaurants/:restaurant_id/menus
@@ -20,7 +20,6 @@ class MenusController < ApplicationController
 
   # GET /menus/by_name/:name
   def show_by_name
-    byebug
     restaurant = Restaurant.find_by(name: params[:name])
     if restaurant
       @menu = restaurant.menus.includes(sections: :products).first
