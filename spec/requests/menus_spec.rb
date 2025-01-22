@@ -20,10 +20,10 @@ RSpec.describe 'Menus', type: :request do
   end
 
   describe 'GET /menus/by_name/:name' do
-    let!(:restaurant1) { create(:restaurant, user: user) }
-    let!(:menu1) { create(:menu, name: 'Test Menu', restaurant: restaurant) }
+    let!(:restaurant1) { create(:restaurant, name: 'test resto', user: user) }
+    let!(:menu1) { create(:menu, name: 'Test Menu', restaurant: restaurant1) }
     it 'returns a success response' do
-      get menus_by_name_path(name: 'Test Menu')
+      get menus_by_name_path(name: 'test resto')
       expect(response).to be_successful
       expect(JSON.parse(response.body)['name']).to eq('Test Menu')
     end

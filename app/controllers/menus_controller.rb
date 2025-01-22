@@ -18,13 +18,19 @@ class MenusController < ApplicationController
     render json: @menu
   end
 
+  # GET /menus/by_name/:name
   def show_by_name
     byebug
-    @menu = Menu.includes(sections: :products).find_by(name: params[:name])
-    if @menu
-      render json: @menu, include: { sections: { include: :products } }
+    restaurant = Restaurant.find_by(name: params[:name])
+    if restaurant
+      @menu = restaurant.menus.includes(sections: :products).first
+      if @menu
+        render json: @menu, include: { sections: { include: :products } }
+      else
+        render json: { error: 'Menu not found' }, status: :not_found
+      end
     else
-      render json: { error: 'Menu not found' }, status: :not_found
+      render json: { error: 'Restaurant not found' }, status: :not_found
     end
   end
 
