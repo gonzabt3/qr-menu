@@ -19,6 +19,21 @@ RSpec.describe 'Menus', type: :request do
     allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
   end
 
+  describe 'GET /menus/by_name/:name' do
+    let!(:restaurant1) { create(:restaurant, user: user) }
+    let!(:menu1) { create(:menu, name: 'Test Menu', restaurant: restaurant) }
+    it 'returns a success response' do
+      get menus_by_name_path(name: 'Test Menu')
+      expect(response).to be_successful
+      expect(JSON.parse(response.body)['name']).to eq('Test Menu')
+    end
+
+    it 'returns a not found response if menu does not exist' do
+      get menus_by_name_path(name: 'Nonexistent Menu')
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
   describe 'GET /restaurants/:restaurant_id/menus' do
     it 'returns a success response' do
       get restaurant_menus_path(restaurant)

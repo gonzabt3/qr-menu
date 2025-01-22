@@ -2,10 +2,10 @@
 
 # app/controllers/menus_controller.rb
 class MenusController < ApplicationController
-  before_action :set_restaurant
+  before_action :set_restaurant, except: %i[show_by_name]
   before_action :set_menu, only: %i[show update destroy]
   before_action :authorize
-  before_action :authorize_restaurant_owner, only: %i[create update destroy]
+  before_action :authorize_restaurant_owner, only: %i[create update destroy], except: %i[show_by_name]
 
   # GET /restaurants/:restaurant_id/menus
   def index
@@ -16,6 +16,16 @@ class MenusController < ApplicationController
   # GET /restaurants/:restaurant_id/menus/:id
   def show
     render json: @menu
+  end
+
+  def show_by_name
+    byebug
+    @menu = Menu.includes(sections: :products).find_by(name: params[:name])
+    if @menu
+      render json: @menu, include: { sections: { include: :products } }
+    else
+      render json: { error: 'Menu not found' }, status: :not_found
+    end
   end
 
   # POST /restaurants/:restaurant_id/menus
