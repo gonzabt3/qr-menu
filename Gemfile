@@ -15,6 +15,7 @@ gem 'jwt'
 gem 'omniauth-auth0'
 gem 'rubocop'
 gem 'byebug'
+gem "tinify"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

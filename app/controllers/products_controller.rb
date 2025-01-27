@@ -1,3 +1,6 @@
+require "tinify"
+Tinify.key = ENV['TINY_PNG_API_KEY']
+
 class ProductsController < ApplicationController
   before_action :set_restaurant
   before_action :set_menu
@@ -25,7 +28,22 @@ class ProductsController < ApplicationController
   # POST /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products
   def create
     byebug
-    @product = @section.products.build(product_params)
+
+    if product_params.key?(:image)
+      image = product_params[:image]
+      byebug
+      product_params_without_image = product_params.except(:image)
+      @product = @section.products.build(product_params_without_image)
+      # Comprimir la imagen usando Tinify
+      source = Tinify.from_file(image.path)
+      compressed_image_path = Rails.root.join('tmp', "compressed_#{image.original_filename}")
+      source.to_file(compressed_image_path.to_s)
+
+      # Lógica adicional si la clave `image` está presente
+      Rails.logger.info "Image key is present in product_params"
+    else
+      @product = @section.products.build(product_params)
+    end
 
     if @product.save
       render json: @product, status: :created
