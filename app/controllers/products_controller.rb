@@ -27,17 +27,26 @@ class ProductsController < ApplicationController
 
   # POST /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products
   def create
-    byebug
-
     if product_params.key?(:image)
       image = product_params[:image]
-      byebug
       product_params_without_image = product_params.except(:image)
       @product = @section.products.build(product_params_without_image)
-      # Comprimir la imagen usando Tinify
-      source = Tinify.from_file(image.path)
-      compressed_image_path = Rails.root.join('tmp', "compressed_#{image.original_filename}")
-      source.to_file(compressed_image_path.to_s)
+
+      byebug
+            # Comprimir la imagen usando Tinify y subirla directamente a S3
+            source = Tinify.from_file(image.path)
+            s3_path = "uploads/#{image.original_filename}"
+            source.store(
+              service: "s3",
+              aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+              aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+              region: ENV['AWS_REGION'],
+              path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
+              headers: { "Cache-Control" => "public, max-age=31536000" },
+              acl: "public-read"
+            )
+      
+
 
       # Lógica adicional si la clave `image` está presente
       Rails.logger.info "Image key is present in product_params"
