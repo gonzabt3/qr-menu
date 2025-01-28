@@ -27,33 +27,32 @@ class ProductsController < ApplicationController
 
   # POST /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products
   def create
-    if product_params.key?(:image)
-      image = product_params[:image]
-      product_params_without_image = product_params.except(:image)
-      @product = @section.products.build(product_params_without_image)
-
-      byebug
-      # Comprimir la imagen usando Tinify y subirla directamente a S3
-      source = Tinify.from_file(image.path)
-      s3_path = "uploads/#{image.original_filename}"
-      source.store(
-        service: 's3',
-        aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-        aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-        region: ENV['AWS_REGION'],
-        path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
-        headers: { 'Cache-Control' => 'public, max-age=31536000' }
-        # acl: "public-read"
-      )
-
-      # Lógica adicional si la clave `image` está presente
-      Rails.logger.info 'Image key is present in product_params'
-    else
-      @product = @section.products.build(product_params)
-    end
+    product_params_without_image = product_params.except(:image)
+    @product = @section.products.build(product_params_without_image)
 
     if @product.save
-      render json: @product, status: :created
+      if product_params.key?(:image)
+        image = product_params[:image]
+        source = Tinify.from_file(image.path)
+        image_extension = File.extname(image.original_filename)
+        s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
+        source.store(
+          service: 's3',
+          aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+          aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+          region: ENV['AWS_REGION'],
+          path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
+          headers: { 'Cache-Control' => 'public, max-age=31536000' }
+          # acl: "public-read"
+        )
+        @product.update(image_url: "https://#{ENV['S3_BUCKET_NAME']}.s3.amazonaws.com/#{s3_path}")
+        # Lógica adicional si la clave `image` está presente
+        Rails.logger.info 'Image key is present in product_params'
+        render json: @product, status: :created
+
+      else
+        render json: @product, status: :created
+      end
     else
       render json: @product.errors, status: :unprocessable_entity
     end
