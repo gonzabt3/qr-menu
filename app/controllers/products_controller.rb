@@ -1,4 +1,4 @@
-require "tinify"
+require 'tinify'
 Tinify.key = ENV['TINY_PNG_API_KEY']
 
 class ProductsController < ApplicationController
@@ -33,23 +33,21 @@ class ProductsController < ApplicationController
       @product = @section.products.build(product_params_without_image)
 
       byebug
-            # Comprimir la imagen usando Tinify y subirla directamente a S3
-            source = Tinify.from_file(image.path)
-            s3_path = "uploads/#{image.original_filename}"
-            source.store(
-              service: "s3",
-              aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-              aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-              region: ENV['AWS_REGION'],
-              path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
-              headers: { "Cache-Control" => "public, max-age=31536000" },
-              acl: "public-read"
-            )
-      
-
+      # Comprimir la imagen usando Tinify y subirla directamente a S3
+      source = Tinify.from_file(image.path)
+      s3_path = "uploads/#{image.original_filename}"
+      source.store(
+        service: 's3',
+        aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+        aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
+        region: ENV['AWS_REGION'],
+        path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
+        headers: { 'Cache-Control' => 'public, max-age=31536000' }
+        # acl: "public-read"
+      )
 
       # Lógica adicional si la clave `image` está presente
-      Rails.logger.info "Image key is present in product_params"
+      Rails.logger.info 'Image key is present in product_params'
     else
       @product = @section.products.build(product_params)
     end
@@ -94,7 +92,7 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    #tddo agregar image to schema
+    # tddo agregar image to schema
     params.permit(:name, :description, :price, :image)
   end
 
