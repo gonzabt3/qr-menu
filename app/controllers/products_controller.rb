@@ -53,7 +53,19 @@ class ProductsController < ApplicationController
 
   # PATCH/PUT /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products/:id
   def update
-    if @product.update(product_params)
+    product_params_without_image = product_params.except(:image)
+    deleteImageOnS3 if product_params[:image].nil? && product_params[:image] != @product.image_url
+    if product_params[:image].present? && product_params[:image] != @product.image_url
+      deleteImageOnS3 if @product.image_url.present?
+      image = product_params[:image]
+      image_extension = File.extname(image.original_filename)
+      s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
+      image_url = S3.new.upload_image(image,
+                                      s3_path)
+    end
+    product_params_without_image[:image_url] = image_url
+
+    if @product.update(product_params_without_image)
       render json: @product
     else
       render json: @product.errors, status: :unprocessable_entity
@@ -62,24 +74,23 @@ class ProductsController < ApplicationController
 
   # DELETE /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products/:id
   def destroy
-    byebug
-    if @product.image_url.present?
-
-      byebug
-      client = Aws::S3::Client.new(
-        region: ENV['AWS_REGION'],
-        access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-        secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
-      )
-      extension = @product.image_url.split('.').last
-      s3_path = "menus/#{@menu.id}/products/#{@product.id}.#{extension}"
-
-      client.delete_object({
-                             bucket: ENV['S3_BUCKET_NAME'],
-                             key: s3_path
-                           })
-    end
+    deleteImageOnS3 if @product.image_url.present?
     @product.destroy
+  end
+
+  def deleteImageOnS3
+    client = Aws::S3::Client.new(
+      region: ENV['AWS_REGION'],
+      access_key_id: ENV['AWS_ACCESS_KEY_ID'],
+      secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
+    )
+    extension = @product.image_url.split('.').last
+    s3_path = "menus/#{@menu.id}/products/#{@product.id}.#{extension}"
+
+    client.delete_object({
+                           bucket: ENV['S3_BUCKET_NAME'],
+                           key: s3_path
+                         })
   end
 
   private

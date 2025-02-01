@@ -8,14 +8,13 @@ class S3
   end
 
   def upload_image(file, path)
-    byebug
     file_name = path
 
     obj = @bucket.object(file_name)
     obj.upload_file(file, acl: 'public-read')
 
     # Return the public URL of the file
-    "https://#{@bucket}.s3.amazonaws.com/#{file_name}"
+    "https://#{@bucket.name}.s3.amazonaws.com/#{file_name}"
   end
 
   def delete_image(file_name)
