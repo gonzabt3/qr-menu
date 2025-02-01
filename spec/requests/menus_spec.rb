@@ -108,4 +108,37 @@ RSpec.describe 'Menus', type: :request do
       end.to change(Menu, :count).by(-1)
     end
   end
+
+  describe 'PUT #set_favorite' do
+    let(:menu1) { create(:menu, restaurant: restaurant) }
+    let(:menu2) { create(:menu, restaurant: restaurant) }
+
+    context 'when the user is the owner of the restaurant' do
+      it 'sets the selected menu as favorite and others as not favorite' do
+        put set_favorite_restaurant_menu_path(restaurant, menu1)
+        menu1.reload
+        menu2.reload
+
+        expect(menu1.favorite).to be true
+        expect(menu2.favorite).to be false
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context 'when the restaurant does not exist' do
+      it 'returns a not found status' do
+        put set_favorite_restaurant_menu_path(2, menu1)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when the menu does not exist' do
+      it 'returns a not found status' do
+        put set_favorite_restaurant_menu_path(restaurant, 3)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

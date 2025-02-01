@@ -3,9 +3,9 @@
 # app/controllers/menus_controller.rb
 class MenusController < ApplicationController
   before_action :set_restaurant, except: %i[show_by_name]
-  before_action :set_menu, only: %i[show update destroy]
+  before_action :set_menu, only: %i[show update destroy set_favorite]
   before_action :authorize, except: %i[show_by_name]
-  before_action :authorize_restaurant_owner, only: %i[create update destroy], except: %i[show_by_name]
+  before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite], except: %i[show_by_name]
 
   # GET /restaurants/:restaurant_id/menus
   def index
@@ -52,6 +52,17 @@ class MenusController < ApplicationController
     else
       render json: @menu.errors, status: :unprocessable_entity
     end
+  end
+
+  # PUT /restaurants/:restaurant_id/menus/:id/set_favorite
+  def set_favorite
+    # Set all menus of the restaurant to not favorite
+    @restaurant.menus.update_all(favorite: false)
+
+    # Set the selected menu as favorite
+    @menu.update(favorite: true)
+
+    render json: @menu
   end
 
   # DELETE /restaurants/:restaurant_id/menus/:id

@@ -30,7 +30,6 @@ class ProductsController < ApplicationController
   def create
     product_params_without_image = product_params.except(:image)
     @product = @section.products.build(product_params_without_image)
-
     if @product.save
       if product_params.key?(:image)
         image = product_params[:image]

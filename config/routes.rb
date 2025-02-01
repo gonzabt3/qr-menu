@@ -13,6 +13,9 @@ Rails.application.routes.draw do
   end
   resources :restaurants, only: %i[index show create update destroy] do
     resources :menus, only: %i[index show create update destroy] do
+      member do
+        put 'set_favorite'
+      end
       get 'products', to: 'products#index_by_menu'
       resources :sections, only: %i[index show create update destroy] do
         resources :products, only: %i[index show create update destroy]

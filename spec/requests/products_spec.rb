@@ -48,12 +48,12 @@ RSpec.describe 'Products', type: :request do
     context 'with valid params' do
       it 'creates a new Product' do
         expect do
-          post restaurant_menu_section_products_path(restaurant, menu, section), params: { product: valid_attributes }
+          post restaurant_menu_section_products_path(restaurant, menu, section), params: valid_attributes
         end.to change(Product, :count).by(1)
       end
 
       it 'renders a JSON response with the new product' do
-        post restaurant_menu_section_products_path(restaurant, menu, section), params: { product: valid_attributes }
+        post restaurant_menu_section_products_path(restaurant, menu, section), params: valid_attributes
         expect(response).to have_http_status(:created)
         expect(response.content_type).to eq('application/json; charset=utf-8')
       end
@@ -76,7 +76,7 @@ RSpec.describe 'Products', type: :request do
 
       it 'updates the requested product' do
         put restaurant_menu_section_product_path(restaurant, menu, section, product),
-            params: { product: new_attributes }
+            params: new_attributes
         product.reload
         expect(product.name).to eq('Updated Product')
       end
@@ -92,7 +92,7 @@ RSpec.describe 'Products', type: :request do
     context 'with invalid params' do
       it 'renders a JSON response with errors for the product' do
         put restaurant_menu_section_product_path(restaurant, menu, section, product),
-            params: { product: invalid_attributes }
+            params: invalid_attributes
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.content_type).to eq('application/json; charset=utf-8')
       end
