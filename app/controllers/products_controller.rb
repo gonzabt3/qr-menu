@@ -1,5 +1,5 @@
 require 'tinify'
-require "aws-sdk-s3"
+require 'aws-sdk-s3'
 Tinify.key = ENV['TINY_PNG_API_KEY']
 
 class ProductsController < ApplicationController
@@ -34,18 +34,8 @@ class ProductsController < ApplicationController
     if @product.save
       if product_params.key?(:image)
         image = product_params[:image]
-        #source = Tinify.from_file(image.path)
         image_extension = File.extname(image.original_filename)
         s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
-        #source.store(
-        #  service: 's3',
-        #  aws_access_key_id: ENV['AWS_ACCESS_KEY_ID'],
-        #  aws_secret_access_key: ENV['AWS_SECRET_ACCESS_KEY'],
-        #  region: ENV['AWS_REGION'],
-        #  path: "#{ENV['S3_BUCKET_NAME']}/#{s3_path}",
-        #  headers: { 'Cache-Control' => 'public, max-age=31536000' }
-          # acl: "public-read"
-        #)
 
         image_url = S3.new.upload_image(image, s3_path)
         @product.update(image_url: image_url)
@@ -74,26 +64,20 @@ class ProductsController < ApplicationController
   def destroy
     byebug
     if @product.image_url.present?
-      
+
       byebug
       client = Aws::S3::Client.new(
         region: ENV['AWS_REGION'],
         access_key_id: ENV['AWS_ACCESS_KEY_ID'],
         secret_access_key: ENV['AWS_SECRET_ACCESS_KEY']
       )
-
-
-      # Inicializar el recurso S3
-     # s3 = Aws::S3::Resource.new(
-      #  region: ENV['AWS_REGION'],
-     #   credentials: Aws::Credentials.new(ENV['AWS_ACCESS_KEY_ID'], ENV['AWS_SECRET_ACCESS_KEY'])
-      #)
-      s3_path = "menus/#{@menu.id}/products/#{@product.id}.png"
+      extension = @product.image_url.split('.').last
+      s3_path = "menus/#{@menu.id}/products/#{@product.id}.#{extension}"
 
       client.delete_object({
-        bucket: ENV['S3_BUCKET_NAME'], 
-        key: s3_path 
-      })
+                             bucket: ENV['S3_BUCKET_NAME'],
+                             key: s3_path
+                           })
     end
     @product.destroy
   end
