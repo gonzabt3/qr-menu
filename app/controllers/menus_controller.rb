@@ -24,9 +24,10 @@ class MenusController < ApplicationController
     if restaurant
       @menu = restaurant.menus.includes(sections: :products).first
       if @menu
-        render json: @menu, include: { sections: { include: :products } }
+        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name)
       else
-        render json: { error: 'Menu not found' }, status: :not_found
+        render json: { error: 'Menu not found' },
+               status: :not_found
       end
     else
       render json: { error: 'Restaurant not found' }, status: :not_found
