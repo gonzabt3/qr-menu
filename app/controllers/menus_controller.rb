@@ -22,7 +22,7 @@ class MenusController < ApplicationController
   def show_by_name
     restaurant = Restaurant.find_by(name: params[:name])
     if restaurant
-      @menu = restaurant.menus.includes(sections: :products).first
+      @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
         render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name)
       else
@@ -37,6 +37,9 @@ class MenusController < ApplicationController
   # POST /restaurants/:restaurant_id/menus
   def create
     @menu = @restaurant.menus.build(menu_params)
+    if @restaurant.menus.count.zero?
+      @menu.favorite = true
+    end
 
     if @menu.save
       render json: @menu, status: :created
