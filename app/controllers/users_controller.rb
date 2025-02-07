@@ -1,4 +1,6 @@
 # app/controllers/users_controller.rb
+require 'mercadopago'
+
 class UsersController < ApplicationController
   before_action :authorize
 
@@ -16,7 +18,7 @@ class UsersController < ApplicationController
 
     if user.nil?
       # Si el usuario no existe en la base de datos, es la primera vez que entra
-      User.create(auth0_id: user_id, email:email)
+      User.create(auth0_id: user_id, email: email)
       render json: { first_login: true }
     else
       # Si el usuario ya existe en la base de datos, no es la primera vez que entra
@@ -31,6 +33,38 @@ class UsersController < ApplicationController
       render json: user, status: :ok
     else
       render json: user.errors, status: :unprocessable_entity
+    end
+  end
+
+  def subscribe
+    user = User.find_by(email: params[:id])
+    byebug
+    if user
+      sdk = Mercadopago::SDK.new(ENV['MERCADO_PAGO_ACCESS_TOKEN'])
+      custom_headers = {
+        'x-idempotency-key': user.id
+      }
+      preapproval_data = {
+        card_token_id: params[:token],
+        payer_email: params[:payer]['email'],
+        back_url: 'https://www.your-site.com',
+        preapproval_plan_id: '2c93808492715acc0192835b31ac05c3',
+        reason: 'Suscripción a tu servicio',
+        external_reference: user.id.to_s
+
+      }
+
+      response = sdk.preapproval.create(preapproval_data)
+
+      if response['status'] == 201
+        # TODO: Guardar algo de la suscripción en la base de datos
+        user.update(subscribed: true)
+        render json: user, status: :ok
+      else
+        render json: { error: 'Subscription failed', details: response['response'] }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'User not found' }, status: :not_found
     end
   end
 
