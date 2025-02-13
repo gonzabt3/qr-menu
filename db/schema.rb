@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_02_01_200015) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_13_181913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_01_200015) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "first_time", default: true
+    t.boolean "subscribed", default: false
   end
 
   add_foreign_key "menus", "restaurants"
