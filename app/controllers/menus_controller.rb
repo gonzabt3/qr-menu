@@ -21,7 +21,8 @@ class MenusController < ApplicationController
   # GET /menus/by_name/:name
   def show_by_name
     restaurant = Restaurant.find_by(name: params[:name])
-    if restaurant
+
+    if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
         render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name)

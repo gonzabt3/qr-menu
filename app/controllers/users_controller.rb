@@ -22,7 +22,7 @@ class UsersController < ApplicationController
       render json: { first_login: true }
     else
       # Si el usuario ya existe en la base de datos, no es la primera vez que entra
-      render json: { first_login: user.first_time }
+      render json: user.as_json.merge(first_login: user.first_time)
     end
   end
 
