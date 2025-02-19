@@ -19,6 +19,8 @@ gem 'puma', '>= 5.0'
 gem 'rack-cors'
 gem 'rubocop'
 gem 'tinify'
+gem 'image_processing'
+gem 'ruby-vips'
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

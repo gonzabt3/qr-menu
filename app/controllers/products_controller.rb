@@ -1,4 +1,4 @@
-require 'tinify'
+require "image_processing/vips"
 require 'aws-sdk-s3'
 Tinify.key = ENV['TINY_PNG_API_KEY']
 
@@ -33,15 +33,28 @@ class ProductsController < ApplicationController
     if @product.save
       if product_params.key?(:image)
         image = product_params[:image]
-        image_extension = File.extname(image.original_filename)
+      
+        # Usar ImageProcessing para redimensionar y convertir la imagen
+        processed_image = ImageProcessing::Vips
+                            .source(image.tempfile)
+                            .resize_to_limit(800, 800)  # Redimensiona la imagen para que no sea mayor de 800x800
+                            .convert("webp")  # Convierte a WebP
+                            .saver(Q: 80)
+                            .call
+  
+        # Generar la ruta del archivo en S3
+        image_extension = ".webp"  # Debido a la conversión, la extensión será WebP
         s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
-
-        image_url = S3.new.upload_image(image, s3_path)
+  
+        # Subir la imagen optimizada a S3
+        image_url = S3.new.upload_image(processed_image, s3_path)
+  
+        # Guardar la URL de la imagen en el producto
         @product.update(image_url: image_url)
+        
         # Lógica adicional si la clave `image` está presente
         Rails.logger.info 'Image key is present in product_params'
         render json: @product, status: :created
-
       else
         render json: @product, status: :created
       end
