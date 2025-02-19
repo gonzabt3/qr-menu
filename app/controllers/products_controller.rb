@@ -33,23 +33,7 @@ class ProductsController < ApplicationController
     if @product.save
       if product_params.key?(:image)
         image = product_params[:image]
-      
-        # Usar ImageProcessing para redimensionar y convertir la imagen
-        processed_image = ImageProcessing::Vips
-                            .source(image.tempfile)
-                            .resize_to_limit(800, 800)  # Redimensiona la imagen para que no sea mayor de 800x800
-                            .convert("webp")  # Convierte a WebP
-                            .saver(Q: 80)
-                            .call
-  
-        # Generar la ruta del archivo en S3
-        image_extension = ".webp"  # Debido a la conversión, la extensión será WebP
-        s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
-  
-        # Subir la imagen optimizada a S3
-        image_url = S3.new.upload_image(processed_image, s3_path)
-  
-        # Guardar la URL de la imagen en el producto
+        image_url = process_and_upload_image(image)
         @product.update(image_url: image_url)
         
         # Lógica adicional si la clave `image` está presente
@@ -70,10 +54,7 @@ class ProductsController < ApplicationController
     if product_params[:image].present? && product_params[:image] != @product.image_url
       deleteImageOnS3 if @product.image_url.present?
       image = product_params[:image]
-      image_extension = File.extname(image.original_filename)
-      s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
-      image_url = S3.new.upload_image(image,
-                                      s3_path)
+      image_url = process_and_upload_image(image)
     end
     product_params_without_image[:image_url] = image_url
 
@@ -132,5 +113,27 @@ class ProductsController < ApplicationController
     return if @section.menu.restaurant.user == current_user
 
     render json: { error: 'You are not authorized to perform this action' }, status: :forbidden
+  end
+
+  def process_and_upload_image(image)
+    # Usar ImageProcessing para redimensionar y convertir la imagen
+    processed_image = ImageProcessing::Vips
+                        .source(image.tempfile)
+                        .resize_to_limit(800, 800)  # Redimensiona la imagen para que no sea mayor de 800x800
+                        .convert("webp")  # Convierte a WebP
+                        .saver(Q: 80)
+                        .call
+
+    # Generar la ruta del archivo en S3
+    image_extension = ".webp"  # Debido a la conversión, la extensión será WebP
+    s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
+
+    # Subir la imagen optimizada a S3
+    s3 = Aws::S3::Resource.new(region: ENV['AWS_REGION'])
+    bucket = s3.bucket(ENV['S3_BUCKET_NAME'])
+    obj = bucket.object(s3_path)
+    obj.upload_file(processed_image.path, acl: 'public-read')
+
+    obj.public_url
   end
 end
