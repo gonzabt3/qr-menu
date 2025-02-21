@@ -23,4 +23,8 @@ Rails.application.routes.draw do
       end
     end
   end
+
+  namespace :api do
+    post 'mercado_pago', to: 'mercado_pago#info'
+  end
 end
