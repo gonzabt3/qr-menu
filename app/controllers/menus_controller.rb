@@ -2,10 +2,10 @@
 
 # app/controllers/menus_controller.rb
 class MenusController < ApplicationController
-  before_action :set_restaurant, except: %i[show_by_name]
+  before_action :set_restaurant, except: %i[show_by_name show_by_restaurant_id]
   before_action :set_menu, only: %i[show update destroy set_favorite]
-  before_action :authorize, except: %i[show_by_name]
-  before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite], except: %i[show_by_name]
+  before_action :authorize, except: %i[show_by_name show_by_restaurant_id]
+  before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite], except: %i[show_by_name show_by_restaurant_id]
 
   # GET /restaurants/:restaurant_id/menus
   def index
@@ -17,6 +17,24 @@ class MenusController < ApplicationController
   def show
     render json: @menu
   end
+
+  # GET /menus/:id
+  def show_by_restaurant_id
+    restaurant = Restaurant.find_by(id: params[:id])
+
+    if restaurant && restaurant.user.subscribed
+      @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
+      if @menu
+        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name)
+      else
+        render json: { error: 'Menu not found' },
+               status: :not_found
+      end
+    else
+      render json: { error: 'Restaurant not found' }, status: :not_found
+    end
+  end
+
 
   # GET /menus/by_name/:name
   def show_by_name
