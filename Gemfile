@@ -12,15 +12,16 @@ gem 'pg', '~> 1.1'
 gem 'aws-sdk-s3'
 gem 'byebug'
 gem 'httparty'
+gem 'image_processing'
 gem 'jwt'
 gem 'mercadopago-sdk'
 gem 'omniauth-auth0'
 gem 'puma', '>= 5.0'
 gem 'rack-cors'
 gem 'rubocop'
-gem 'tinify'
-gem 'image_processing'
 gem 'ruby-vips'
+gem 'tinify'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 
@@ -50,6 +51,7 @@ group :development, :test do
   gem 'debug', platforms: %i[mri windows]
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
+  gem 'rspec-core'
   gem 'rspec-rails'
 end
 

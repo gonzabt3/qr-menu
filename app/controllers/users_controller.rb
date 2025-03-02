@@ -38,6 +38,7 @@ class UsersController < ApplicationController
 
   def subscribe
     user = User.find_by(email: params[:id])
+
     if user
       sdk = Mercadopago::SDK.new(ENV['MERCADO_PAGO_ACCESS_TOKEN'])
       custom_headers = {
@@ -53,7 +54,6 @@ class UsersController < ApplicationController
       }
 
       response = sdk.preapproval.create(preapproval_data)
-
       if response[:status] == 201
         user.update(subscribed: true)
         render json: user, status: :ok

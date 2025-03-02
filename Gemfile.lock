@@ -367,6 +367,7 @@ DEPENDENCIES
   puma (>= 5.0)
   rack-cors
   rails (~> 7.1.3, >= 7.1.3.2)
+  rspec-core
   rspec-rails
   rubocop
   ruby-vips

@@ -1,4 +1,4 @@
-require "image_processing/vips"
+require 'image_processing/vips'
 require 'aws-sdk-s3'
 Tinify.key = ENV['TINY_PNG_API_KEY']
 
@@ -35,7 +35,7 @@ class ProductsController < ApplicationController
         image = product_params[:image]
         image_url = process_and_upload_image(image)
         @product.update(image_url: image_url)
-        
+
         # Lógica adicional si la clave `image` está presente
         Rails.logger.info 'Image key is present in product_params'
         render json: @product, status: :created
@@ -118,14 +118,14 @@ class ProductsController < ApplicationController
   def process_and_upload_image(image)
     # Usar ImageProcessing para redimensionar y convertir la imagen
     processed_image = ImageProcessing::Vips
-                        .source(image.tempfile)
-                        .resize_to_limit(800, 800)  # Redimensiona la imagen para que no sea mayor de 800x800
-                        .convert("webp")  # Convierte a WebP
-                        .saver(Q: 80)
-                        .call
+                      .source(image.tempfile)
+                      .resize_to_limit(800, 800) # Redimensiona la imagen para que no sea mayor de 800x800
+                      .convert('webp') # Convierte a WebP
+                      .saver(Q: 80)
+                      .call
 
     # Generar la ruta del archivo en S3
-    image_extension = ".webp"  # Debido a la conversión, la extensión será WebP
+    image_extension = '.webp' # Debido a la conversión, la extensión será WebP
     s3_path = "menus/#{@menu.id}/products/#{@product.id}#{image_extension}"
 
     # Subir la imagen optimizada a S3
