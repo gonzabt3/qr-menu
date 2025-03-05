@@ -60,6 +60,10 @@ RSpec.describe 'UsersController', type: :request do
 
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)['subscribed']).to be_truthy
+
+        user.reload
+        expect(user.subscription_id).to eq(JSON.parse(response.body)['subscription_id'])
+        expect(user.payer_id).to eq(JSON.parse(response.body)['payer_id'])
       end
     end
 
