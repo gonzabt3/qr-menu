@@ -3,6 +3,6 @@ class Restaurant < ApplicationRecord
   belongs_to :user
   has_many :menus, dependent: :destroy
 
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: { case_sensitive: false }
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }
 end

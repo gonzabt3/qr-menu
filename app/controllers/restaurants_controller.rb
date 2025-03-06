@@ -34,7 +34,11 @@ class RestaurantsController < ApplicationController
     if @restaurant.save
       render json: @restaurant, status: :created
     else
-      render json: @restaurant.errors, status: :unprocessable_entity
+      if @restaurant.errors[:name].include?("has already been taken")
+        render json: { error: "Restaurant name must be unique" }, status: :unprocessable_entity
+      else
+        render json: @restaurant.errors, status: :unprocessable_entity
+      end
     end
   end
 
