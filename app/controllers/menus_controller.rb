@@ -5,7 +5,8 @@ class MenusController < ApplicationController
   before_action :set_restaurant, except: %i[show_by_name show_by_restaurant_id]
   before_action :set_menu, only: %i[show update destroy set_favorite]
   before_action :authorize, except: %i[show_by_name show_by_restaurant_id]
-  before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite], except: %i[show_by_name show_by_restaurant_id]
+  before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite],
+                                             except: %i[show_by_name show_by_restaurant_id]
 
   # GET /restaurants/:restaurant_id/menus
   def index
@@ -35,11 +36,9 @@ class MenusController < ApplicationController
     end
   end
 
-
   # GET /menus/by_name/:name
   def show_by_name
     restaurant = Restaurant.find_by(name: params[:name])
-
     if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
@@ -56,9 +55,7 @@ class MenusController < ApplicationController
   # POST /restaurants/:restaurant_id/menus
   def create
     @menu = @restaurant.menus.build(menu_params)
-    if @restaurant.menus.count.zero?
-      @menu.favorite = true
-    end
+    @menu.favorite = true if @restaurant.menus.count.zero?
 
     if @menu.save
       render json: @menu, status: :created
