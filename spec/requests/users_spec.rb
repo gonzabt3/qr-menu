@@ -127,4 +127,68 @@ RSpec.describe 'UsersController', type: :request do
       end
     end
   end
+  describe 'POST /unsubscribe' do
+    let(:user) { create(:user, email: 'test@example.com', subscription_id: '2c938084726fca480172750000000000') }
+
+    before do
+      allow_any_instance_of(ApplicationController).to receive(:authorize).and_return(true)
+      allow_any_instance_of(ApplicationController).to receive(:current_user).and_return(user)
+      allow(Mercadopago::SDK).to receive(:new).and_return(double('SDK',
+                                                                 preapproval: double('Preapproval',
+                                                                                     cancel: sdk_response)))
+    end
+
+    context 'when the unsubscription is successful' do
+      let(:sdk_response) do
+        {
+          status: 200,
+          response: {}
+        }
+      end
+
+      it 'updates the user subscription status' do
+        post unsubscribe_user_path(user.email)
+
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['message']).to eq('Subscription cancelled successfully')
+
+        user.reload
+        expect(user.subscribed).to be_falsey
+        expect(user.subscription_id).to be_nil
+        expect(user.payer_id).to be_nil
+      end
+    end
+
+    context 'when the unsubscription fails' do
+      let(:sdk_response) do
+        {
+          status: 422,
+          response: { message: 'Error' }
+        }
+      end
+
+      it 'returns an error message' do
+        post unsubscribe_user_path(user.email)
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)['error']).to eq('Failed to cancel subscription')
+      end
+    end
+
+    context 'when the user is not found or not subscribed' do
+      let(:sdk_response) do
+        {
+          status: 200,
+          response: {}
+        }
+      end
+
+      it 'returns a not found error' do
+        post unsubscribe_user_path('nonexistent@example.com')
+
+        expect(response).to have_http_status(:not_found)
+        expect(JSON.parse(response.body)['error']).to eq('User not found or not subscribed')
+      end
+    end
+  end
 end

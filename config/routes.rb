@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   resources :users, only: %i[create update] do
     post 'subscribe', to: 'users#subscribe', on: :member, constraints: { id: /.*/ }
+    post 'unsubscribe', to: 'users#unsubscribe', on: :member, constraints: { id: /.*/ }
     get 'restaurants', to: 'restaurants#index_by_email', on: :member, constraints: { id: /.*/ }
   end
   resources :restaurants, only: %i[index show create update destroy] do

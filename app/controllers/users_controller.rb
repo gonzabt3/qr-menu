@@ -66,6 +66,24 @@ class UsersController < ApplicationController
     end
   end
 
+  def unsubscribe
+    user = User.find_by(email: params[:id])
+  
+    if user && user.subscription_id
+      sdk = Mercadopago::SDK.new(ENV['MERCADO_PAGO_ACCESS_TOKEN'])
+      response = sdk.preapproval.cancel(user.subscription_id)
+  
+      if response[:status] == 200
+        user.update(subscribed: false, subscription_id: nil, payer_id: nil)
+        render json: { message: 'Subscription cancelled successfully' }, status: :ok
+      else
+        render json: { error: 'Failed to cancel subscription', details: response['response'] }, status: :unprocessable_entity
+      end
+    else
+      render json: { error: 'User not found or not subscribed' }, status: :not_found
+    end
+  end
+
   private
 
   def user_params
