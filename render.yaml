@@ -1,23 +1,91 @@
+# Exported from Render on 2025-03-14T18:45:29Z
 databases:
-  - name: qr_menu_test
-    databaseName: qr_menu_test
-    user: qr_menu_test_user
-    plan: free
-
+- name: qr_menu_test
+  databaseName: qr_menu_test
+  user: qr_menu_test_user
+  plan: basic-256mb
+  region: oregon
+  ipAllowList:
+  - source: 0.0.0.0/0
+    description: everywhere
+  postgresMajorVersion: "16"
+  diskSizeGB: 1
 services:
-  - type: web
-    name: qr-menu
-    runtime: ruby
-    plan: free
-    buildCommand: "./bin/render-build.sh"
-    # preDeployCommand: "bundle exec rails db:migrate" # preDeployCommand only available on paid instance types
-    startCommand: "bundle exec rails server"
-    envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: qr_menu_test
-          property: connectionString
-      - key: RAILS_MASTER_KEY
-        sync: false
-      - key: WEB_CONCURRENCY
-        value: 2 # sensible default
+- type: web
+  name: qr-menu-webhooks
+  runtime: ruby
+  repo: https://github.com/gonzabt3/qr-menu-webhooks
+  plan: free
+  envVars:
+  - key: WEBHOOK_KEY_MERCADO_PAGO
+    sync: false
+  - key: PRIVATE_BACKEND_URL
+    sync: false
+  region: oregon
+  buildCommand: bundle install
+  startCommand: bundle exec ruby app.rb
+- type: web
+  name: qr-menu-ui
+  runtime: node
+  repo: https://github.com/gonzabt3/qr-menu-ui
+  plan: free
+  envVars:
+  - key: NEXT_PUBLIC_FRONTEND_URL
+    sync: false
+  - key: NEXT_PUBLIC_AUTH0_CALLBACK_URL
+    sync: false
+  - key: NEXT_PUBLIC_AUTH0_AUDIENCE
+    sync: false
+  - key: NEXT_PUBLIC_AUTH_DOMAIN
+    sync: false
+  - key: NEXT_PUBLIC_AUTH_CLIENT_ID
+    sync: false
+  - key: NEXT_PUBLIC_API_SERVER_URL
+    sync: false
+  - key: AUTH_CLIENT_ID
+    sync: false
+  - key: AUTH_DOMAIN
+    sync: false
+  - key: PORT
+    sync: false
+  - key: NEXT_PUBLIC_API_URL
+    sync: false
+  region: oregon
+  buildCommand: yarn add  typescript @types/react @types/node; yarn; yarn build
+  startCommand: yarn start
+- type: web
+  name: qr-menu
+  runtime: ruby
+  repo: https://github.com/gonzabt3/qr-menu
+  plan: free
+  envVars:
+  - key: MERCADO_PAGO_ACCESS_TOKEN
+    sync: false
+  - key: S3_BUCKET_NAME
+    sync: false
+  - key: AWS_REGION
+    sync: false
+  - key: AWS_SECRET_ACCESS_KEY
+    sync: false
+  - key: AWS_ACCESS_KEY_ID
+    sync: false
+  - key: AUTH0_AUDIENCE
+    sync: false
+  - key: CLIENT_ORIGIN_URL
+    sync: false
+  - key: AUTH0_DOMAIN
+    sync: false
+  - key: CORS_ALLOWED_ORIGINS
+    sync: false
+  - key: DATABASE_URL
+    fromDatabase:
+      name: qr_menu_test
+      property: connectionString
+  - key: WEB_CONCURRENCY
+    sync: false
+  - key: RAILS_MASTER_KEY
+    sync: false
+  region: oregon
+  buildCommand: ./bin/render-build.sh
+  startCommand: bundle exec rails server
+version: "1"
