@@ -55,8 +55,8 @@ class UsersController < ApplicationController
 
       response = sdk.preapproval.create(preapproval_data)
       if response[:status] == 201
-        user.update(subscribed: true, subscription_id: response[:response][:id],
-                    payer_id: response[:response][:payer_id])
+        user.update(subscribed: true, subscription_id: response[:response]['id'],
+                    payer_id: response[:response]['payer_id'])
         render json: user, status: :ok
       else
         render json: { error: 'Subscription failed', details: response['response'] }, status: :unprocessable_entity
@@ -68,16 +68,16 @@ class UsersController < ApplicationController
 
   def unsubscribe
     user = User.find_by(email: params[:id])
-  
     if user && user.subscription_id
       sdk = Mercadopago::SDK.new(ENV['MERCADO_PAGO_ACCESS_TOKEN'])
-      response = sdk.preapproval.cancel(user.subscription_id)
-  
+      response = sdk.preapproval.update(user.subscription_id, { status: 'cancelled' })
+
       if response[:status] == 200
         user.update(subscribed: false, subscription_id: nil, payer_id: nil)
         render json: { message: 'Subscription cancelled successfully' }, status: :ok
       else
-        render json: { error: 'Failed to cancel subscription', details: response['response'] }, status: :unprocessable_entity
+        render json: { error: 'Failed to cancel subscription', details: response['response'] },
+               status: :unprocessable_entity
       end
     else
       render json: { error: 'User not found or not subscribed' }, status: :not_found
