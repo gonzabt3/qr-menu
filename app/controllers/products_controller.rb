@@ -101,12 +101,12 @@ class ProductsController < ApplicationController
   end
 
   def set_product
-    @product = @section.products.find(params[:id])
+    # @product = @section.products.find(params[:id])
+    @product = Product.find(params[:id])
   end
 
   def product_params
-    # tddo agregar image to schema
-    params.permit(:name, :description, :price, :image)
+    params.permit(:name, :description, :price, :image, :section_id)
   end
 
   def authorize_restaurant_owner
