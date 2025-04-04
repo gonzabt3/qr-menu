@@ -48,7 +48,7 @@ class UsersController < ApplicationController
         card_token_id: params[:token],
         payer_email: params[:payer]['email'],
         back_url: 'https://www.your-site.com',
-        preapproval_plan_id: '2c93808492715acc0192835b31ac05c3',
+        preapproval_plan_id: ENV['MERCADO_PAGO_PRE_APPROVAL_PLAN_ID'],
         reason: 'Suscripción a tu servicio',
         external_reference: user.id.to_s
       }
