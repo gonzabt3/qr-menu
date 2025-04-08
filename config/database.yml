@@ -82,3 +82,4 @@ production:
   database: qr_menu_prod
   username: qr_menu_prod_user
   password: <%= ENV["QR_MENU_DATABASE_PASSWORD"] %>
+  host: <%= ENV["QR_MENU_DATABASE_HOST"] %>
