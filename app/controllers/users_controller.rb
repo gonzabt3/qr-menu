@@ -15,7 +15,6 @@ class UsersController < ApplicationController
 
   def check_first_login
     user = @current_user
-
     if user.nil?
       # Si el usuario no existe en la base de datos, es la primera vez que entra
       User.create(auth0_id: user_id, email: email)

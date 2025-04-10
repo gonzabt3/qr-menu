@@ -29,7 +29,7 @@ module Secured
     email_user = @decoded_token.token[0]['https://qr-menu.io/claims/email']
     @current_user = User.find_by(email: email_user)
     if @current_user.nil?
-      User.create(email: email_user)
+      User.create(email: email_user, auth0_id: @decoded_token.token[0]['sub'].split('|').last)
       @current_user = User.find_by(email: email_user)
     end
     return unless (error = validation_response.error)
