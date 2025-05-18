@@ -55,7 +55,7 @@ class UsersController < ApplicationController
       response = sdk.preapproval.create(preapproval_data)
       if response[:status] == 201
         user.update(subscribed: true, subscription_id: response[:response]['id'],
-                    payer_id: response[:response]['payer_id'])
+                    payer_id: response[:response]['payer_id'], first_time: false)
         render json: user, status: :ok
       else
         render json: { error: 'Subscription failed', details: response['response'] }, status: :unprocessable_entity
