@@ -50,14 +50,23 @@ class ProductsController < ApplicationController
   # PATCH/PUT /restaurants/:restaurant_id/menus/:menu_id/sections/:section_id/products/:id
   def update
     product_params_without_image = product_params.except(:image)
-    deleteImageOnS3 if product_params[:image].nil? && product_params[:image] != @product.image_url
-    if product_params[:image].present? && product_params[:image] != @product.image_url
+
+    # Manejar el caso en el que `image` sea `nil`
+    if product_params[:image].nil?
+      deleteImageOnS3 if @product.image_url.present?
+      product_params_without_image[:image_url] = nil
+    elsif product_params[:image].present? && product_params[:image] != @product.image_url
+      # Manejar el caso en el que se proporciona una nueva imagen
       deleteImageOnS3 if @product.image_url.present?
       image = product_params[:image]
       image_url = process_and_upload_image(image)
+      product_params_without_image[:image_url] = image_url
+    else
+      # Mantener la URL actual de la imagen si no se proporciona una nueva
+      product_params_without_image[:image_url] = @product.image_url
     end
-    product_params_without_image[:image_url] = image_url
 
+    # Actualizar el producto
     if @product.update(product_params_without_image)
       render json: @product
     else
