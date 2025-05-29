@@ -41,6 +41,19 @@ class SectionsController < ApplicationController
     @section.destroy
   end
 
+  # PATCH /menus/:menu_id/sections/reorder
+  def reorder
+    ActiveRecord::Base.transaction do
+      params[:sections].each_with_index do |section_id, index|
+        section = @menu.sections.find(section_id)
+        section.update!(order: index)
+      end
+    end
+    render json: { message: 'Orden actualizado correctamente' }, status: :ok
+  rescue ActiveRecord::RecordInvalid => e
+    render json: { error: e.message }, status: :unprocessable_entity
+  end
+
   private
 
   def set_restaurant

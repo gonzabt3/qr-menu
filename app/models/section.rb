@@ -4,4 +4,7 @@ class Section < ApplicationRecord
   has_many :products, dependent: :destroy
 
   validates :name, presence: true
+  validates :order, presence: true, numericality: { only_integer: true }
+
+  default_scope { order(:order) }
 end

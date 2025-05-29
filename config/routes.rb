@@ -9,7 +9,6 @@ Rails.application.routes.draw do
   get 'menus/by_name/:name', to: 'menus#show_by_name', as: 'menus_by_name'
   get 'menus/by_restaurant_id/:id', to: 'menus#show_by_restaurant_id', as: 'menus_by_restaurant_id'
 
-
   resources :users, only: %i[create update] do
     post 'subscribe', to: 'users#subscribe', on: :member, constraints: { id: /.*/ }
     post 'unsubscribe', to: 'users#unsubscribe', on: :member, constraints: { id: /.*/ }
@@ -23,6 +22,9 @@ Rails.application.routes.draw do
       get 'products', to: 'products#index_by_menu'
       resources :sections, only: %i[index show create update destroy] do
         resources :products, only: %i[index show create update destroy]
+        collection do
+          patch :reorder # Ruta para reordenar las secciones
+        end
       end
     end
   end
