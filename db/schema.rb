@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_29_131413) do
+ActiveRecord::Schema[7.1].define(version: 2025_06_27_194701) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -32,6 +32,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_29_131413) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "image_url"
+    t.boolean "is_vegan", default: false
+    t.boolean "is_celiac", default: false
     t.index ["section_id"], name: "index_products_on_section_id"
   end
 

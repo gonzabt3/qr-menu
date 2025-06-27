@@ -115,7 +115,7 @@ class ProductsController < ApplicationController
   end
 
   def product_params
-    params.permit(:name, :description, :price, :image, :section_id)
+    params.permit(:name, :description, :price, :image, :section_id, :is_vegan, :is_celiac)
   end
 
   def authorize_restaurant_owner
