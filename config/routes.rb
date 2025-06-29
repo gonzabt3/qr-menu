@@ -8,6 +8,7 @@ Rails.application.routes.draw do
   get 'check_first_login', to: 'users#check_first_login'
   get 'menus/by_name/:name', to: 'menus#show_by_name', as: 'menus_by_name'
   get 'menus/by_restaurant_id/:id', to: 'menus#show_by_restaurant_id', as: 'menus_by_restaurant_id'
+  post 'ai_chat/prompt', to: 'ai_chat#prompt'
 
   resources :users, only: %i[create update] do
     post 'subscribe', to: 'users#subscribe', on: :member, constraints: { id: /.*/ }
