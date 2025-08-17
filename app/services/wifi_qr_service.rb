@@ -62,6 +62,6 @@ class WifiQrService
 
   # Escape special characters per spec
   def escape(str)
-    str.to_s.gsub(/([\\;,:\"])"?/) { |m| "\\#{m}" }
+    str.to_s.gsub(/([\\;,:\"])/) { |m| "\\#{m}" }
   end
 end

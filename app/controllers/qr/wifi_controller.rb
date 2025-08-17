@@ -1,5 +1,7 @@
 module Qr
   class WifiController < ApplicationController
+    skip_before_action :authorize, only: [:show]
+    
     # Public endpoint to generate WiFi QR codes
     def show
       ssid = params[:ssid]

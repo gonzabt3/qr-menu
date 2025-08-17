@@ -17,6 +17,16 @@ RSpec.describe WifiQrService, type: :service do
       expect(svc.payload).to eq("WIFI:T:nopass;S:OpenNet;H:false;")
     end
 
+    it 'normalizes WPA2 to WPA' do
+      svc = WifiQrService.new(ssid: 'Net', auth: 'WPA2', password: 'pass', hidden: false)
+      expect(svc.payload).to eq("WIFI:T:WPA;S:Net;P:pass;H:false;")
+    end
+
+    it 'normalizes WPA3 to WPA' do
+      svc = WifiQrService.new(ssid: 'Net', auth: 'WPA3', password: 'pass', hidden: false)
+      expect(svc.payload).to eq("WIFI:T:WPA;S:Net;P:pass;H:false;")
+    end
+
     it 'raises when ssid missing' do
       expect { WifiQrService.new(ssid: '', auth: 'WPA', password: 'x').payload }.to raise_error(ArgumentError)
     end

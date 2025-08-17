@@ -16,6 +16,18 @@ RSpec.describe 'QR Wifi endpoint', type: :request do
       expect(response.body).to include('WIFI:')
     end
 
+    it 'works with open network (nopass)' do
+      get '/qr/wifi', params: { ssid: 'OpenWifi', auth: 'nopass' }
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq('image/png')
+    end
+
+    it 'works with hidden network parameter' do
+      get '/qr/wifi', params: { ssid: 'HiddenNet', auth: 'WPA', password: 'secret', hidden: 'true' }
+      expect(response).to have_http_status(:ok)
+      expect(response.content_type).to eq('image/png')
+    end
+
     it 'returns error for invalid format' do
       get '/qr/wifi', params: { ssid: 'Office', auth: 'WPA', password: 'pass', format: 'gif' }
       expect(response).to have_http_status(:bad_request)
@@ -24,6 +36,11 @@ RSpec.describe 'QR Wifi endpoint', type: :request do
 
     it 'returns error for missing ssid' do
       get '/qr/wifi', params: { ssid: '', auth: 'WPA', password: 'pass' }
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'returns error for missing password in secured network' do
+      get '/qr/wifi', params: { ssid: 'SecureNet', auth: 'WPA', password: '' }
       expect(response).to have_http_status(:bad_request)
     end
   end
