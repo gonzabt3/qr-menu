@@ -13,7 +13,8 @@ RSpec.describe 'QR Wifi endpoint', type: :request do
       get '/qr/wifi', params: { ssid: 'Office', auth: 'WPA', password: 'pass', format: 'svg' }
       expect(response).to have_http_status(:ok)
       expect(response.content_type).to eq('image/svg+xml')
-      expect(response.body).to include('WIFI:')
+      expect(response.body).to include('<svg')
+      expect(response.body).to include('</svg>')
     end
 
     it 'returns error for invalid format' do

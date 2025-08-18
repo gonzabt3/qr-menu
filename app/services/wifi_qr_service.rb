@@ -43,16 +43,18 @@ class WifiQrService
   def validate!
     raise ArgumentError, 'ssid is required' if ssid.strip.empty?
     raise ArgumentError, 'invalid auth type' unless VALID_AUTHS.include?(auth)
-    if auth != 'nopass' && password.to_s.strip.empty?
-      raise ArgumentError, 'password is required for secured networks'
-    end
+    return unless auth != 'nopass' && password.to_s.strip.empty?
+
+    raise ArgumentError, 'password is required for secured networks'
   end
 
   def normalize_auth(a)
     return 'nopass' if a.to_s.downcase == 'nopass'
+
     a = a.to_s.upcase
     return 'WPA' if a.start_with?('WPA')
     return 'WEP' if a == 'WEP'
+
     a
   end
 
@@ -62,6 +64,6 @@ class WifiQrService
 
   # Escape special characters per spec
   def escape(str)
-    str.to_s.gsub(/([\\;,:\"])"?/) { |m| "\\#{m}" }
+    str.to_s.gsub(/([\\;,:"])/) { |m| "\\#{m}" }
   end
 end
