@@ -52,6 +52,11 @@ class MenusController < ApplicationController
     end
   end
 
+  # GET /menus/:id/fullData
+  def full_data
+    render json: @menu.as_json(include: { sections: { include: :products } })
+  end
+
   # POST /restaurants/:restaurant_id/menus
   def create
     @menu = @restaurant.menus.build(menu_params)

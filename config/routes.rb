@@ -8,7 +8,7 @@ Rails.application.routes.draw do
   get 'check_first_login', to: 'users#check_first_login'
   get 'menus/by_name/:name', to: 'menus#show_by_name', as: 'menus_by_name'
   get 'menus/by_restaurant_id/:id', to: 'menus#show_by_restaurant_id', as: 'menus_by_restaurant_id'
-
+  get 'menus/:id/fullData', to: 'menus#full_data', as: 'menu_full_data'
   resources :users, only: %i[create update] do
     post 'subscribe', to: 'users#subscribe', on: :member, constraints: { id: /.*/ }
     post 'unsubscribe', to: 'users#unsubscribe', on: :member, constraints: { id: /.*/ }
