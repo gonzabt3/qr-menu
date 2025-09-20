@@ -2,8 +2,8 @@
 
 # app/controllers/menus_controller.rb
 class MenusController < ApplicationController
-  before_action :set_restaurant, except: %i[show_by_name show_by_restaurant_id]
-  before_action :set_menu, only: %i[show update destroy set_favorite]
+  before_action :set_restaurant, except: %i[show_by_name show_by_restaurant_id full_data]
+  before_action :set_menu, only: %i[show update destroy set_favorite full_data]
   before_action :authorize, except: %i[show_by_name show_by_restaurant_id]
   before_action :authorize_restaurant_owner, only: %i[create update destroy set_favorite],
                                              except: %i[show_by_name show_by_restaurant_id]
@@ -101,7 +101,11 @@ class MenusController < ApplicationController
   end
 
   def set_menu
-    @menu = @restaurant.menus.find(params[:id])
+    @menu = if defined?(@restaurant) && @restaurant.present?
+              @restaurant.menus.find(params[:id])
+            else
+              Menu.find(params[:id])
+            end
   end
 
   def menu_params
