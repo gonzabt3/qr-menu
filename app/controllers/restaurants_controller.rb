@@ -42,12 +42,10 @@ class RestaurantsController < ApplicationController
         @restaurant.update(logo_url: logo_url)
       end
       render json: @restaurant, status: :created
+    elsif @restaurant.errors[:name].include?('has already been taken')
+      render json: { error: 'Restaurant name must be unique' }, status: :unprocessable_entity
     else
-      if @restaurant.errors[:name].include?("has already been taken")
-        render json: { error: "Restaurant name must be unique" }, status: :unprocessable_entity
-      else
-        render json: @restaurant.errors, status: :unprocessable_entity
-      end
+      render json: @restaurant.errors, status: :unprocessable_entity
     end
   end
 
@@ -112,16 +110,23 @@ class RestaurantsController < ApplicationController
                            bucket: ENV['S3_BUCKET_NAME'],
                            key: s3_path
                          })
+    Rails.logger.info "Successfully deleted logo from S3: #{s3_path}"
+  rescue Aws::S3::Errors::AccessDenied => e
+    Rails.logger.warn "AccessDenied when deleting logo from S3: #{e.message}"
+    # Continue execution even if deletion fails
+  rescue StandardError => e
+    Rails.logger.error "Error deleting logo from S3: #{e.message}"
+    # Continue execution even if deletion fails
   end
 
   def process_and_upload_logo(logo)
     # Use ImageProcessing to resize and convert the image
     processed_logo = ImageProcessing::Vips
-                      .source(logo.tempfile)
-                      .resize_to_limit(800, 800) # Resize the image to be no larger than 800x800
-                      .convert('webp') # Convert to WebP
-                      .saver(Q: 80)
-                      .call
+                     .source(logo.tempfile)
+                     .resize_to_limit(800, 800) # Resize the image to be no larger than 800x800
+                     .convert('webp') # Convert to WebP
+                     .saver(Q: 80)
+                     .call
 
     # Generate the S3 file path
     logo_extension = '.webp' # Due to conversion, the extension will be WebP
