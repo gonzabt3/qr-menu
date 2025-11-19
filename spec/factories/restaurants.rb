@@ -8,6 +8,7 @@ FactoryBot.define do
     website { "http://example.com" }
     instagram { "http://instagram.com/test" }
     description { "A test restaurant" }
+    logo_url { nil }
     association :user
   end
 end
