@@ -21,6 +21,8 @@ gem 'rack-cors'
 gem 'rubocop'
 gem 'ruby-vips'
 gem 'tinify'
+gem 'rqrcode'
+gem 'rqrcode_png'
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"

@@ -32,4 +32,8 @@ Rails.application.routes.draw do
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
   end
+
+  namespace :qr do
+    get 'wifi', to: 'wifi#show'
+  end
 end
