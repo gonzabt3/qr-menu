@@ -93,9 +93,11 @@ curl -X POST http://localhost:3000/api/feedback \
 
 #### List All Feedbacks (Admin)
 
-Retrieve all submitted feedbacks. This endpoint is protected and requires authentication.
+Retrieve submitted feedbacks (limited to 1000 most recent). This endpoint is protected and requires authentication.
 
 **Endpoint:** `GET /api/feedbacks`
+
+**Limits:** Returns up to 1000 most recent feedbacks, ordered by creation date (newest first).
 
 **Authentication:**
 
