@@ -67,7 +67,7 @@ Submit user feedback about the application.
 **Success Response (201 Created):**
 ```json
 {
-  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "id": 1,
   "message": "Your feedback message here",
   "createdAt": "2024-11-21T05:13:20.000Z"
 }
@@ -108,12 +108,12 @@ Set the `FEEDBACK_READ_SECRET` environment variable and provide it in one of two
 ```json
 [
   {
-    "id": "550e8400-e29b-41d4-a716-446655440000",
+    "id": 3,
     "message": "Latest feedback",
     "createdAt": "2024-11-21T05:13:20.000Z"
   },
   {
-    "id": "660e8400-e29b-41d4-a716-446655440001",
+    "id": 2,
     "message": "Earlier feedback",
     "createdAt": "2024-11-20T03:10:15.000Z"
   }
@@ -139,7 +139,7 @@ curl -X GET "http://localhost:3000/api/feedbacks?secret=your_secret_here"
 
 Feedback data is stored in the PostgreSQL database in the `feedbacks` table with the following schema:
 
-- `id` (UUID) - Primary key
+- `id` (BIGINT) - Primary key (auto-incremented)
 - `message` (TEXT) - Feedback message content
 - `created_at` (TIMESTAMP) - When the feedback was created
 - `updated_at` (TIMESTAMP) - When the feedback was last updated
