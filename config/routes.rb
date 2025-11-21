@@ -29,10 +29,10 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :feedbacks, only: [:create, :index]
+
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
-    post 'feedback', to: 'feedbacks#create'
-    get 'feedbacks', to: 'feedbacks#index'
   end
 
   namespace :qr do
