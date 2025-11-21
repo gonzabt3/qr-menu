@@ -153,6 +153,22 @@ Feedback data is stored in the PostgreSQL database in the `feedbacks` table with
 * MercadoPago payment integration
 * Auth0 authentication
 
+## Admin Backoffice
+
+This repository now includes a Next.js frontend admin backoffice for managing restaurants and viewing feedback.
+
+### Quick Start
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+The admin interface will be available at `http://localhost:3001/admin`
+
+For detailed setup instructions, authentication configuration, and API integration, see [docs/Admin.md](docs/Admin.md).
+
 ## Deployment instructions
 
 This application is configured for deployment on Render.com (see `render.yaml`).
