@@ -2,7 +2,7 @@
 
 module Api
   class FeedbacksController < ApplicationController
-    skip_before_action :authorize, only: [:create]
+    skip_before_action :authorize
 
     # POST /api/feedback
     def create
