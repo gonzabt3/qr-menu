@@ -49,7 +49,7 @@ module Api
 
       provided_secret = request.headers['X-Feedback-Secret'] || params[:secret]
       
-      unless provided_secret == secret
+      if provided_secret.blank? || !ActiveSupport::SecurityUtils.secure_compare(secret, provided_secret)
         render json: { error: 'Unauthorized' }, status: :unauthorized
       end
     end
