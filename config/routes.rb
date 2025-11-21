@@ -29,6 +29,8 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :feedbacks, only: [:create, :index]
+
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
   end

@@ -3,6 +3,10 @@
 module Secured
   extend ActiveSupport::Concern
 
+  included do
+    before_action :authorize
+  end
+
   REQUIRES_AUTHENTICATION = { message: 'Requires authentication' }.freeze
   BAD_CREDENTIALS = {
     message: 'Bad bad credentials'
