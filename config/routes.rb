@@ -31,6 +31,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
+    post 'feedback', to: 'feedbacks#create'
+    get 'feedbacks', to: 'feedbacks#index'
   end
 
   namespace :qr do
