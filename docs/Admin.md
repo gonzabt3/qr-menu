@@ -25,7 +25,7 @@ The admin UI is built with:
 ### Prerequisites
 
 1. Ruby on Rails backend running (this repository)
-2. Backend configured with Auth0 authentication (see qr-menu-ui PR #12)
+2. Backend configured with Auth0 authentication (when the Auth0 PR is merged)
 3. Node.js 18+ and npm installed
 
 ### Installation

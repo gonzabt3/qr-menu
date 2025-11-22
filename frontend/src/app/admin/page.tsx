@@ -9,30 +9,32 @@ import apiClient from '@/lib/api';
  * This page displays a list of all restaurants.
  * It requires authentication via the backend Auth0 implementation.
  * 
+ * ⚠️ SECURITY WARNING: Authentication is not fully implemented!
+ * The current implementation uses an empty token which allows unauthorized access.
+ * This is a PLACEHOLDER and MUST be updated before production deployment.
+ * 
  * TODO: Update authentication logic based on the backend Auth0 implementation
  * - The backend should set session cookies after successful Auth0 login
  * - This page should check for valid session and redirect to login if needed
  * - You may need to adjust the auth checking mechanism based on backend implementation
+ * 
+ * Implementation steps:
+ * 1. Import Next.js cookies() from 'next/headers'
+ * 2. Retrieve the auth token/session from cookies
+ * 3. Validate the token with the backend
+ * 4. Redirect to login if invalid or missing
  */
 export default async function AdminPage() {
+  // ⚠️ SECURITY: Token is empty - this allows unauthorized access!
   // TODO: Implement proper authentication check
-  // This is a placeholder - adjust based on backend Auth0 implementation
-  // Options:
-  // 1. Check for session cookie and validate it
-  // 2. Call backend /api/auth/me endpoint to verify session
-  // 3. Use middleware to handle auth before reaching this page
+  // Example: const token = cookies().get('auth_token')?.value || '';
   
   let restaurants;
   let error: string | null = null;
 
   try {
-    // For now, we'll attempt to fetch restaurants
-    // In production, you should pass the session token from cookies
-    // Example: const token = cookies().get('auth_token')?.value;
-    
-    // This will fail without proper authentication
-    // You'll need to implement session management
-    const token = ''; // TODO: Get from session/cookies
+    // ⚠️ SECURITY WARNING: Empty token bypasses authentication
+    const token = ''; // TODO: Get from session/cookies - DO NOT DEPLOY WITHOUT FIXING THIS
     
     if (!token) {
       // Redirect to backend login if no token

@@ -16,7 +16,16 @@ interface PageProps {
  * Displays detailed information about a specific restaurant
  * and lists all feedback associated with it.
  * 
+ * ⚠️ SECURITY WARNING: Authentication is not fully implemented!
+ * The current implementation uses an empty token which allows unauthorized access.
+ * This is a PLACEHOLDER and MUST be updated before production deployment.
+ * 
  * TODO: Update authentication logic to match backend Auth0 implementation
+ * Implementation steps:
+ * 1. Import Next.js cookies() from 'next/headers'
+ * 2. Retrieve the auth token/session from cookies
+ * 3. Validate the token with the backend
+ * 4. Redirect to login if invalid or missing
  */
 export default async function RestaurantDetailPage({ params }: PageProps) {
   const { id } = await params;
@@ -26,9 +35,10 @@ export default async function RestaurantDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  // ⚠️ SECURITY: Token is empty - this allows unauthorized access!
   // TODO: Implement proper authentication check
-  // Get token from session/cookies
-  const token = ''; // TODO: Get from session/cookies
+  // Example: const token = cookies().get('auth_token')?.value || '';
+  const token = ''; // TODO: Get from session/cookies - DO NOT DEPLOY WITHOUT FIXING THIS
   
   if (!token) {
     redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
