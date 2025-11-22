@@ -1,4 +1,5 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
+// import { redirect } from 'next/navigation'; // Uncomment when implementing auth
 import Link from 'next/link';
 import AdminLayout from '@/components/admin/AdminLayout';
 import FeedbackList from '@/components/admin/FeedbackList';
@@ -40,9 +41,13 @@ export default async function RestaurantDetailPage({ params }: PageProps) {
   // Example: const token = cookies().get('auth_token')?.value || '';
   const token = ''; // TODO: Get from session/cookies - DO NOT DEPLOY WITHOUT FIXING THIS
   
-  if (!token) {
-    redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
-  }
+  // Note: With empty token, the API call will fail and we'll show an error
+  // This prevents infinite redirects while still indicating auth is needed
+  // Once auth is implemented, uncomment the redirect below
+  
+  // if (!token) {
+  //   redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
+  // }
 
   let restaurant;
   let feedbacks;

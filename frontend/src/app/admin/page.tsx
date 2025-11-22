@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+// import { redirect } from 'next/navigation'; // Uncomment when implementing auth
 import AdminLayout from '@/components/admin/AdminLayout';
 import RestaurantList from '@/components/admin/RestaurantList';
 import apiClient from '@/lib/api';
@@ -36,17 +36,18 @@ export default async function AdminPage() {
     // ⚠️ SECURITY WARNING: Empty token bypasses authentication
     const token = ''; // TODO: Get from session/cookies - DO NOT DEPLOY WITHOUT FIXING THIS
     
-    if (!token) {
-      // Redirect to backend login if no token
-      redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
-    }
+    // Note: With empty token, the API call will fail and we'll show an error
+    // This prevents infinite redirects while still indicating auth is needed
+    // Once auth is implemented, uncomment the redirect below
+    
+    // if (!token) {
+    //   redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
+    // }
     
     restaurants = await apiClient.getRestaurants(token);
   } catch (err) {
     console.error('Failed to fetch restaurants:', err);
     error = err instanceof Error ? err.message : 'Failed to load restaurants';
-    // If authentication fails, redirect to login
-    // redirect(`${process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:3000'}/api/auth/login`);
   }
 
   return (

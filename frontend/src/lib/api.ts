@@ -149,9 +149,15 @@ export const apiClient = {
   async getRestaurantFeedbacks(restaurantId: number, token: string): Promise<Feedback[]> {
     // This is a placeholder - the backend may need a specific endpoint
     // for restaurant-specific feedback
-    const allFeedbacks = await apiFetch<Feedback[]>('/feedbacks', { token });
-    // Filter by restaurant if the feedback includes restaurant info
-    return allFeedbacks;
+    try {
+      const allFeedbacks = await apiFetch<Feedback[]>('/feedbacks', { token });
+      // TODO: Filter by restaurant ID when backend provides restaurant association
+      // For now, return all feedbacks (backend doesn't associate feedback with restaurants yet)
+      return allFeedbacks;
+    } catch (error) {
+      console.error('Failed to fetch feedbacks:', error);
+      return [];
+    }
   },
 
   /**
