@@ -26,8 +26,8 @@ class FeedbacksController < ApplicationController
 
   # GET /feedbacks
   def index
-    authenticate_with_secret!
-
+    return unless validate_admin_access
+    
     feedbacks = Feedback.includes(:user).order(created_at: :desc).limit(1000)
     render json: feedbacks.map { |f|
       {
@@ -47,23 +47,5 @@ class FeedbacksController < ApplicationController
 
   def feedback_params
     params.require(:feedback).permit(:message)
-  end
-
-  def authenticate_with_secret!
-    secret = ENV['FEEDBACK_READ_SECRET']
-    
-    if secret.blank?
-      render json: { error: 'FEEDBACK_READ_SECRET not configured' }, status: :service_unavailable
-      return
-    end
-
-    provided_secret = request.headers['X-Feedback-Secret'] || params[:secret]
-    
-    # Ensure provided_secret is a string and has the same length as secret to prevent timing leaks
-    if provided_secret.blank? || 
-       provided_secret.to_s.bytesize != secret.bytesize ||
-       !ActiveSupport::SecurityUtils.secure_compare(secret, provided_secret.to_s)
-      render json: { error: 'Unauthorized' }, status: :unauthorized
-    end
   end
 end

@@ -7,8 +7,33 @@ class RestaurantsController < ApplicationController
 
   # GET /restaurants
   def index
-    @restaurants = Restaurant.all
-    render json: @restaurants
+    # Si es admin, mostrar todos los restaurantes
+    # Si es usuario normal, solo mostrar sus restaurantes
+    if is_admin_user?
+      @restaurants = Restaurant.all.includes(:user)
+      render json: @restaurants.map { |r|
+        {
+          id: r.id,
+          name: r.name,
+          address: r.address,
+          phone: r.phone,
+          email: r.email,
+          website: r.website,
+          instagram: r.instagram,
+          description: r.description,
+          status: 'active', # Campo por defecto ya que no existe en la BD
+          createdAt: r.created_at.iso8601,
+          owner: {
+            id: r.user&.id,
+            email: r.user&.email,
+            name: r.user&.name
+          }
+        }
+      }
+    else
+      @restaurants = current_user.restaurants
+      render json: @restaurants
+    end
   end
 
   # GET /users/:user_id/restaurants
@@ -57,6 +82,11 @@ class RestaurantsController < ApplicationController
   end
 
   private
+
+  def is_admin_user?
+    admin_emails = ENV['ADMIN_EMAILS']&.split(',')&.map(&:strip)&.map(&:downcase) || []
+    current_user&.email&.downcase.in?(admin_emails)
+  end
 
   def set_restaurant
     @restaurant = Restaurant.find(params[:id])
