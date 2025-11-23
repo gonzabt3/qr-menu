@@ -84,9 +84,16 @@ module Api
       def find_similar_products(query_embedding, limit: 5)
         # Use pgvector's cosine distance operator
         # Returns products ordered by similarity (lower distance = more similar)
+        # Convert array embedding to pgvector format: [1,2,3]
+        embedding_str = if query_embedding.is_a?(Array)
+                         "[#{query_embedding.join(',')}]"
+                       else
+                         query_embedding
+                       end
+        
         Product.select(
           'products.*',
-          "embedding <-> '#{query_embedding.to_s.gsub('[', '{').gsub(']', '}')}' AS similarity_score"
+          "embedding <-> '#{embedding_str}' AS similarity_score"
         )
                .where.not(embedding: nil)
                .order('similarity_score ASC')
