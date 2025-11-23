@@ -9,22 +9,67 @@ A Ruby on Rails API for managing restaurant menus with QR code functionality.
 
 ## System dependencies
 
-* PostgreSQL database
+* PostgreSQL database with pgvector extension
 * Ruby 3.3.0
+* Redis (for Sidekiq background jobs)
 
 ## Configuration
 
 Set up the following environment variables:
 
 * `DATABASE_URL` - PostgreSQL database connection string (production)
+* `REDIS_URL` - Redis connection string (default: redis://localhost:6379/0)
 * `FEEDBACK_READ_SECRET` - Secret token for accessing feedback list (optional)
 * `MERCADO_PAGO_ACCESS_TOKEN` - MercadoPago API token
 * Auth0 configuration variables
+
+### AI Chat Configuration (Optional)
+
+The application includes an AI-powered chat feature for helping customers explore the menu. This feature is disabled by default and requires configuration:
+
+#### Required Environment Variables
+
+* `FEATURE_AI_CHAT_ENABLED` - Set to `true` to enable the AI chat feature (default: disabled)
+* `AI_PROVIDER` - AI provider to use: `deepseek` (default) or `openai`
+* `DEEPSEEK_API_KEY` - API key for DeepSeek (if using DeepSeek provider)
+* `OPENAI_API_KEY` - API key for OpenAI (if using OpenAI provider)
+* `ENABLE_AI_CHAT_LOGS` - Set to `true` to enable detailed logging (default: false)
+
+#### pgvector Setup
+
+The AI chat feature uses pgvector for storing and searching product embeddings. You need to enable the extension in your PostgreSQL database:
+
+```sql
+-- Run this SQL command in your database
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+For local development with PostgreSQL:
+```bash
+psql -d qr_menu_development -c 'CREATE EXTENSION IF NOT EXISTS vector;'
+```
+
+#### Background Jobs
+
+The application uses Sidekiq for processing embedding generation jobs. Start Sidekiq:
+
+```bash
+bundle exec sidekiq -C config/sidekiq.yml
+```
+
+Make sure Redis is running:
+```bash
+redis-server
+```
 
 ## Database creation
 
 ```bash
 rails db:create
+
+# Enable pgvector extension (if using AI chat)
+psql -d qr_menu_development -c 'CREATE EXTENSION IF NOT EXISTS vector;'
+
 rails db:migrate
 ```
 
@@ -152,6 +197,125 @@ Feedback data is stored in the PostgreSQL database in the `feedbacks` table with
 * User feedback collection
 * MercadoPago payment integration
 * Auth0 authentication
+* AI-powered menu chat assistant (optional, feature flag controlled)
+
+## AI Chat Feature
+
+The application includes an AI-powered chat assistant that helps customers discover menu items based on their preferences (e.g., "What can I eat if I'm vegan?").
+
+### How it works
+
+1. **Embeddings Generation**: When products are created or updated (and the feature is enabled), the system generates semantic embeddings using the configured AI provider (DeepSeek or OpenAI).
+
+2. **Vector Search**: User queries are converted to embeddings and matched against product embeddings using pgvector's similarity search.
+
+3. **AI Response**: The most relevant products are sent to the AI provider along with the user query to generate a helpful, contextual response.
+
+### Backfill Embeddings
+
+If you enable the AI chat feature on an existing database with products, run the backfill task to generate embeddings for all existing products:
+
+```bash
+# Make sure Sidekiq is running
+bundle exec sidekiq -C config/sidekiq.yml
+
+# In another terminal, run the backfill task
+FEATURE_AI_CHAT_ENABLED=true rails product_embeddings:backfill
+```
+
+### API Endpoint
+
+**Endpoint:** `POST /api/ai/chat`
+
+**Request Body:**
+```json
+{
+  "user_query": "¿qué puedo comer si soy vegano?",
+  "session_id": "optional-session-id",
+  "locale": "es"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "answer": "Te recomiendo la Ensalada Vegana, que es completamente vegana y fresca con ingredientes orgánicos...",
+  "references": [
+    {
+      "product_id": 123,
+      "name": "Ensalada Vegana",
+      "score": 0.15
+    }
+  ],
+  "session_id": "generated-or-provided-session-id"
+}
+```
+
+**Error Responses:**
+- `404 Not Found` - Feature is not enabled (FEATURE_AI_CHAT_ENABLED != true)
+- `400 Bad Request` - Missing or invalid user_query parameter
+- `500 Internal Server Error` - Error processing the request
+
+**Example using curl:**
+```bash
+curl -X POST http://localhost:3000/api/ai/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_query": "¿qué puedo comer si soy vegano?",
+    "locale": "es"
+  }'
+```
+
+### Privacy & Data Storage
+
+- User queries are **not stored** in the database by default
+- When `ENABLE_AI_CHAT_LOGS=true`, only metadata is logged (query hash, timestamp, product references) - not the actual query text
+- Session IDs are ephemeral and only used for request tracking
+- Product embeddings are stored in the database for similarity search
+
+### Testing the AI Chat Locally
+
+1. Enable pgvector extension in your database:
+   ```bash
+   psql -d qr_menu_development -c 'CREATE EXTENSION IF NOT EXISTS vector;'
+   ```
+
+2. Run migrations:
+   ```bash
+   rails db:migrate
+   ```
+
+3. Set up environment variables in `.env`:
+   ```
+   FEATURE_AI_CHAT_ENABLED=true
+   AI_PROVIDER=openai
+   OPENAI_API_KEY=your-api-key-here
+   ENABLE_AI_CHAT_LOGS=true
+   REDIS_URL=redis://localhost:6379/0
+   ```
+
+4. Start Redis and Sidekiq:
+   ```bash
+   redis-server &
+   bundle exec sidekiq -C config/sidekiq.yml &
+   ```
+
+5. Generate embeddings for existing products:
+   ```bash
+   rails product_embeddings:backfill
+   ```
+
+6. Start the Rails server:
+   ```bash
+   rails server
+   ```
+
+7. Test the endpoint:
+   ```bash
+   curl -X POST http://localhost:3000/api/ai/chat \
+     -H "Content-Type: application/json" \
+     -d '{"user_query":"¿qué puedo comer si soy vegano?"}'
+   ```
 
 ## Deployment instructions
 
