@@ -25,9 +25,10 @@ module Api
 
         # Find similar products using vector similarity
         # Using cosine distance with pgvector
+        # Using sanitize_sql_array to prevent SQL injection
         similar_products = Product
           .where.not(embedding: nil)
-          .order(Arel.sql("embedding <=> '#{query_embedding_encoded}'"))
+          .order(Product.sanitize_sql_array(["embedding <=> ?", query_embedding_encoded]))
           .limit(5)
 
         log_info("Found #{similar_products.count} similar products")
