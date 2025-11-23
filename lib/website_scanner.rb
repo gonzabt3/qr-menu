@@ -81,13 +81,19 @@ class WebsiteScanner
     links.each do |l|
       abs = absolute_link(l)
       next unless abs
-      if abs.include?('instagram.com')
-        path = URI.parse(abs).path rescue nil
-        if path
-          user = path.split('/').reject(&:blank?).first
-          return "https://instagram.com/#{user}" if user
+      begin
+        uri = URI.parse(abs)
+        # Check if the host is exactly instagram.com or a subdomain of instagram.com
+        if uri.host && (uri.host == 'instagram.com' || uri.host.end_with?('.instagram.com'))
+          path = uri.path
+          if path
+            user = path.split('/').reject(&:blank?).first
+            return "https://instagram.com/#{user}" if user
+          end
+          return abs
         end
-        return abs
+      rescue URI::InvalidURIError
+        next
       end
     end
     nil

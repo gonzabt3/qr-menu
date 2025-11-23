@@ -31,7 +31,7 @@ RSpec.describe GooglePlacesService, type: :service do
     end
 
     before do
-      stub_request(:get, /maps.googleapis.com\/maps\/api\/place\/nearbysearch\/json/)
+      stub_request(:get, /maps\.googleapis\.com\/maps\/api\/place\/nearbysearch\/json/)
         .to_return(status: 200, body: mock_response.to_json, headers: { 'Content-Type' => 'application/json' })
     end
 
@@ -44,7 +44,7 @@ RSpec.describe GooglePlacesService, type: :service do
 
     it 'includes keyword in search when provided' do
       service.nearby_search(lat: lat, lng: lng, keyword: 'pizza')
-      expect(WebMock).to have_requested(:get, /maps.googleapis.com/).with(query: hash_including('keyword' => 'pizza'))
+      expect(WebMock).to have_requested(:get, /maps\.googleapis\.com/).with(query: hash_including('keyword' => 'pizza'))
     end
   end
 
@@ -66,7 +66,7 @@ RSpec.describe GooglePlacesService, type: :service do
     end
 
     before do
-      stub_request(:get, /maps.googleapis.com\/maps\/api\/place\/details\/json/)
+      stub_request(:get, /maps\.googleapis\.com\/maps\/api\/place\/details\/json/)
         .to_return(status: 200, body: mock_details.to_json, headers: { 'Content-Type' => 'application/json' })
     end
 
