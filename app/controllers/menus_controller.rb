@@ -26,7 +26,11 @@ class MenusController < ApplicationController
     if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
-        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name, restaurantPhone: restaurant.phone)
+        menu_data = @menu.as_json(include: { sections: { include: :products } })
+        menu_data[:restaurant] = restaurant.as_json
+        menu_data[:restaurantName] = restaurant.name
+        menu_data[:restaurantPhone] = restaurant.phone
+        render json: menu_data
       else
         render json: { error: 'Menu not found' },
                status: :not_found
@@ -42,7 +46,11 @@ class MenusController < ApplicationController
     if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
-        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name, restaurantPhone: restaurant.phone)
+        menu_data = @menu.as_json(include: { sections: { include: :products } })
+        menu_data[:restaurant] = restaurant.as_json
+        menu_data[:restaurantName] = restaurant.name
+        menu_data[:restaurantPhone] = restaurant.phone
+        render json: menu_data
       else
         render json: { error: 'Menu not found' },
                status: :not_found
