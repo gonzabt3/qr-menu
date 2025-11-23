@@ -48,23 +48,25 @@ RSpec.describe 'Api::Ai::ChatsController', type: :request do
 
       context 'with valid query' do
         let!(:product1) do
-          create(:product, 
+          p = create(:product, 
                  section: section,
                  name: 'Ensalada Verde', 
                  description: 'Ensalada fresca con vegetales',
                  price: 10.50,
-                 is_vegan: true,
-                 embedding: mock_embedding)
+                 is_vegan: true)
+          p.update_columns(embedding: Pgvector.encode(mock_embedding))
+          p
         end
 
         let!(:product2) do
-          create(:product,
+          p = create(:product,
                  section: section,
                  name: 'Hamburguesa de Carne',
                  description: 'Hamburguesa con carne',
                  price: 15.00,
-                 is_vegan: false,
-                 embedding: mock_embedding)
+                 is_vegan: false)
+          p.update_columns(embedding: Pgvector.encode(mock_embedding))
+          p
         end
 
         it 'returns a successful response with answer and references' do

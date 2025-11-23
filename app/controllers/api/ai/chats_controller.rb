@@ -21,12 +21,13 @@ module Api
 
         # Generate embedding for user query
         query_embedding = AiClient.embed(user_query)
+        query_embedding_encoded = Pgvector.encode(query_embedding)
 
         # Find similar products using vector similarity
         # Using cosine distance with pgvector
         similar_products = Product
           .where.not(embedding: nil)
-          .order(Arel.sql("embedding <=> '#{query_embedding}'"))
+          .order(Arel.sql("embedding <=> '#{query_embedding_encoded}'"))
           .limit(5)
 
         log_info("Found #{similar_products.count} similar products")

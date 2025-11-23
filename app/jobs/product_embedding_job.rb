@@ -28,8 +28,9 @@ class ProductEmbeddingJob
     duration = Time.current - start_time
 
     # Save embedding to database
+    # Use Pgvector.encode to convert array to pgvector format
     product.update_columns(
-      embedding: embedding,
+      embedding: Pgvector.encode(embedding),
       embedding_generated_at: Time.current
     )
 
