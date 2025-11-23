@@ -8,8 +8,6 @@ class Product < ApplicationRecord
   # Enqueue embedding job after create/update if AI chat is enabled
   after_commit :enqueue_embedding_job, on: [:create, :update], if: :should_generate_embedding?
 
-  has_neighbors :embedding
-
   def combined_text_for_embedding
     parts = []
     parts << "Nombre: #{name}" if name.present?

@@ -3,7 +3,13 @@ require 'rails_helper'
 
 RSpec.describe ProductEmbeddingJob, type: :job do
   let(:mock_embedding) { Array.new(1536) { rand } }
-  let!(:product) { create(:product, name: 'Test Product', description: 'Test description') }
+  
+  # Create required associations
+  let!(:user) { create(:user) }
+  let!(:restaurant) { create(:restaurant, user: user) }
+  let!(:menu) { create(:menu, restaurant: restaurant) }
+  let!(:section) { create(:section, menu: menu) }
+  let!(:product) { create(:product, section: section, name: 'Test Product', description: 'Test description') }
 
   before do
     allow(ENV).to receive(:[]).and_call_original
@@ -61,7 +67,7 @@ RSpec.describe ProductEmbeddingJob, type: :job do
     end
 
     context 'with product without text' do
-      let!(:empty_product) { create(:product, name: '', description: nil, price: 0) }
+      let!(:empty_product) { create(:product, section: section, name: '', description: nil, price: 0) }
 
       before do
         # Allow validation to be bypassed for test

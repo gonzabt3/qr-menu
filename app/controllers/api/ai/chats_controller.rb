@@ -2,6 +2,8 @@
 module Api
   module Ai
     class ChatsController < ApplicationController
+      # Skip authentication for AI chat endpoint
+      skip_before_action :authorize_request, raise: false
       # Skip CSRF for API endpoint
       skip_before_action :verify_authenticity_token, raise: false
 

@@ -1,5 +1,5 @@
 # app/services/ai_client.rb
-class AiClient
+module AiClient
   class << self
     def embed(text)
       provider.embed(text)
@@ -14,10 +14,10 @@ class AiClient
     def provider
       case ENV['AI_PROVIDER']&.downcase
       when 'openai'
-        AiClient::OpenAi.new
+        OpenAi.new
       else
         # Default to deepseak
-        AiClient::Deepseak.new
+        Deepseak.new
       end
     end
   end

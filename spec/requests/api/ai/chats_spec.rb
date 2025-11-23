@@ -28,6 +28,12 @@ RSpec.describe 'Api::Ai::ChatsController', type: :request do
       let(:mock_embedding) { Array.new(1536) { rand } }
       let(:mock_answer) { 'Tenemos varias opciones veganas disponibles en el menú.' }
 
+      # Create required associations
+      let!(:user) { create(:user) }
+      let!(:restaurant) { create(:restaurant, user: user) }
+      let!(:menu) { create(:menu, restaurant: restaurant) }
+      let!(:section) { create(:section, menu: menu) }
+
       before do
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with('FEATURE_AI_CHAT_ENABLED').and_return('true')
@@ -43,16 +49,20 @@ RSpec.describe 'Api::Ai::ChatsController', type: :request do
       context 'with valid query' do
         let!(:product1) do
           create(:product, 
+                 section: section,
                  name: 'Ensalada Verde', 
                  description: 'Ensalada fresca con vegetales',
+                 price: 10.50,
                  is_vegan: true,
                  embedding: mock_embedding)
         end
 
         let!(:product2) do
           create(:product,
+                 section: section,
                  name: 'Hamburguesa de Carne',
                  description: 'Hamburguesa con carne',
+                 price: 15.00,
                  is_vegan: false,
                  embedding: mock_embedding)
         end
