@@ -4,6 +4,8 @@ require 'json'
 
 class GooglePlacesService
   BASE = "https://maps.googleapis.com/maps/api/place"
+  # Google Places API requires a short delay between paginated requests
+  PAGE_TOKEN_DELAY = 2
 
   def initialize(api_key: ENV['GOOGLE_PLACES_API_KEY'])
     raise "GOOGLE_PLACES_API_KEY not set" unless api_key.present?
@@ -11,7 +13,7 @@ class GooglePlacesService
   end
 
   # Search restaurants around a lat/lng within radius (meters).
-  def nearby_search(lat:, lng:, radius: 2000, keyword: nil, max_pages: 3)
+  def nearby_search(lat:, lng:, radius: 2000, keyword: nil, max_pages: 3, page_delay: PAGE_TOKEN_DELAY)
     results = []
     next_page_token = nil
     max_pages.times do
@@ -31,7 +33,7 @@ class GooglePlacesService
       results += parsed["results"] || []
       next_page_token = parsed["next_page_token"]
       break unless next_page_token.present?
-      sleep 2
+      sleep page_delay
     end
     results
   end

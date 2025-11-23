@@ -58,7 +58,8 @@ class WebsiteScanner
     return nil if href.start_with?('javascript:') || href.start_with?('#') || href.start_with?('mailto:')
     begin
       URI.join(@url, href).to_s
-    rescue
+    rescue URI::InvalidURIError, ArgumentError => e
+      Rails.logger.debug("Invalid URI when joining #{@url} and #{href}: #{e.message}")
       nil
     end
   end
