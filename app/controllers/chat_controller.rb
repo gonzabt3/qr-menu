@@ -93,15 +93,17 @@ class ChatController < ApplicationController
   def find_similar_products(query_embedding, section_ids, limit = 5)
     return [] if query_embedding.blank?
 
-    # Convert embedding array to PostgreSQL vector format
-    embedding_str = "[#{query_embedding.join(',')}]"
-
     # Use pgvector's cosine distance operator (<=>)
     # Lower distance means more similar
+    # Use parameterized query to prevent SQL injection
     Product.joins(:section)
            .where(sections: { id: section_ids })
            .where.not(embedding: nil)
-           .select("products.*, (embedding <=> '#{embedding_str}') as similarity_score")
+           .select(
+             "products.*, " \
+             "(embedding <=> ?) as similarity_score",
+             query_embedding.to_s
+           )
            .order('similarity_score ASC')
            .limit(limit)
   end

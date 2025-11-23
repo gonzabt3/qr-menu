@@ -2,7 +2,8 @@
 # DeepSeek AI client implementation
 class AiClient::Deepseek < AiClient
   API_BASE_URL = 'https://api.deepseek.com/v1'
-  EMBEDDING_MODEL = 'deepseek-chat' # DeepSeek uses chat model for embeddings
+  # Note: DeepSeek doesn't have a dedicated embedding API yet
+  # We generate deterministic pseudo-embeddings based on text content
   CHAT_MODEL = 'deepseek-chat'
 
   def initialize
@@ -10,36 +11,12 @@ class AiClient::Deepseek < AiClient
     raise ConfigurationError, 'DEEPSEEK_API_KEY environment variable not set' if @api_key.blank?
   end
 
-  # Generate embedding using DeepSeek API
+  # Generate embedding using deterministic pseudo-embedding algorithm
+  # TODO: Replace with actual DeepSeek embedding API when available
   def embed(text)
     return Array.new(1536, 0.0) if text.blank?
 
-    # DeepSeek uses the chat endpoint to generate embeddings
-    # We'll use a special prompt to get semantic representation
-    response = http_client.post(
-      "#{API_BASE_URL}/chat/completions",
-      headers: headers,
-      body: {
-        model: EMBEDDING_MODEL,
-        messages: [
-          {
-            role: 'system',
-            content: 'Generate a semantic embedding for the following text. Respond only with a numerical vector representation.'
-          },
-          {
-            role: 'user',
-            content: text
-          }
-        ],
-        temperature: 0.0,
-        max_tokens: 1
-      }.to_json
-    )
-
-    handle_api_error(response, 'DeepSeek') unless response.success?
-
-    # For now, create a deterministic pseudo-embedding based on text content
-    # In production, you would use DeepSeek's actual embedding API if available
+    # Generate deterministic pseudo-embedding from text
     generate_pseudo_embedding(text)
   rescue StandardError => e
     Rails.logger.error("DeepSeek embed error: #{e.message}")

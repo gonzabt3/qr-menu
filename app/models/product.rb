@@ -44,8 +44,7 @@ class Product < ApplicationRecord
                   saved_change_to_description? || 
                   saved_change_to_is_vegan? || 
                   saved_change_to_is_celiac? ||
-                  saved_change_to_price? ||
-                  needs_embedding_regeneration?
+                  saved_change_to_price?
     
     ProductEmbeddingJob.perform_later(id)
   end

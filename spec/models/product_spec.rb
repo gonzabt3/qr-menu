@@ -96,6 +96,8 @@ RSpec.describe Product, type: :model do
 
     it 'enqueues embedding job after update of relevant fields' do
       product = create(:product)
+      # Clear the job queue from the create
+      ActiveJob::Base.queue_adapter.enqueued_jobs.clear
       
       expect {
         product.update(name: 'New Name')
@@ -104,7 +106,8 @@ RSpec.describe Product, type: :model do
 
     it 'does not enqueue job when irrelevant fields change' do
       product = create(:product)
-      product.update_columns(embedding: [0.1] * 1536, embedding_generated_at: Time.current)
+      # Clear the job queue from the create
+      ActiveJob::Base.queue_adapter.enqueued_jobs.clear
       
       # image_url is not part of the embedding generation trigger
       expect {
