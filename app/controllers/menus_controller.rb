@@ -30,6 +30,7 @@ class MenusController < ApplicationController
         menu_data[:restaurant] = restaurant.as_json
         menu_data[:restaurantName] = restaurant.name
         menu_data[:restaurantPhone] = restaurant.phone
+        menu_data[:design_configuration] = @menu.design_config_hash
         render json: menu_data
       else
         render json: { error: 'Menu not found' },
@@ -50,6 +51,7 @@ class MenusController < ApplicationController
         menu_data[:restaurant] = restaurant.as_json
         menu_data[:restaurantName] = restaurant.name
         menu_data[:restaurantPhone] = restaurant.phone
+        menu_data[:design_configuration] = @menu.design_config_hash
         render json: menu_data
       else
         render json: { error: 'Menu not found' },

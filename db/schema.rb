@@ -10,9 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_23_215407) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "design_configurations", force: :cascade do |t|
+    t.bigint "menu_id", null: false
+    t.string "primary_color", default: "#ff7a00"
+    t.string "secondary_color", default: "#64748b"
+    t.string "background_color", default: "#fefaf4"
+    t.string "text_color", default: "#1f2937"
+    t.string "font", default: "Inter"
+    t.text "logo_url"
+    t.boolean "show_whatsapp", default: true
+    t.boolean "show_instagram", default: true
+    t.boolean "show_phone", default: true
+    t.boolean "show_maps", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.boolean "show_restaurant_logo", default: true
+    t.index ["menu_id"], name: "index_design_configurations_on_menu_id", unique: true
+  end
 
   create_table "feedbacks", force: :cascade do |t|
     t.text "message", null: false
@@ -87,6 +105,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
     t.string "subscription_id"
   end
 
+  add_foreign_key "design_configurations", "menus"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "menus", "restaurants"
   add_foreign_key "products", "sections"

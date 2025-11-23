@@ -20,6 +20,8 @@ Rails.application.routes.draw do
         put 'set_favorite'
       end
       get 'products', to: 'products#index_by_menu'
+      # Ruta para configuración de diseño
+      resource :design_configuration, only: [:show, :update]
       resources :sections, only: %i[index show create update destroy] do
         resources :products, only: %i[index show create update destroy]
         collection do
