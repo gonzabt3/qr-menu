@@ -59,7 +59,9 @@ class GooglePlacesService
     http.open_timeout = 5
     response = http.request(req)
     unless response.is_a?(Net::HTTPSuccess)
-      Rails.logger.warn("Google Places API error: #{response.code} #{response.message} for #{uri}")
+      error_msg = "Google Places API error: #{response.code} #{response.message} for #{uri}"
+      Rails.logger.warn(error_msg)
+      raise StandardError, error_msg
     end
     response
   rescue => e

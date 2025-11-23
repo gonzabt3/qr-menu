@@ -51,7 +51,7 @@ module Admin
 
     def authenticate_admin!
       authorize
-      validate_admin_access
+      return unless validate_admin_access
     end
   end
 end

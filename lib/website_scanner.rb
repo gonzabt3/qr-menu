@@ -89,7 +89,6 @@ class WebsiteScanner
         return abs
       end
     end
-    meta = doc.at('meta[property="og:site_name"], meta[name="og:site_name"]')
-    meta && meta['content']
+    nil
   end
 end
