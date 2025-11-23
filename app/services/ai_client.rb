@@ -24,7 +24,7 @@ class AiClient
     def provider
       @provider ||= case ENV.fetch('AI_PROVIDER', 'deepseak').downcase
                     when 'openai'
-                      AiClient::OpenAI.new
+                      AiClient::OpenAi.new
                     when 'deepseak'
                       AiClient::Deepseak.new
                     else

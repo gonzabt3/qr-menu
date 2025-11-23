@@ -69,15 +69,18 @@ RSpec.describe ProductEmbeddingJob, type: :job do
 
     context 'when product has no text' do
       let!(:empty_product) do
-        create(:product,
+        # Create with valid name first
+        prod = create(:product,
                section: section,
-               name: nil,
+               name: 'Temp',
                description: nil,
                price: 0)
+        # Then clear the name bypassing validations
+        prod.update_columns(name: '', description: nil)
+        prod
       end
 
       before do
-        empty_product.update_columns(name: '') # Bypass validation
         allow(ENV).to receive(:[]).and_call_original
         allow(ENV).to receive(:[]).with('ENABLE_AI_CHAT_LOGS').and_return('false')
       end

@@ -30,8 +30,10 @@ class ProductEmbeddingJob
     embedding = AiClient.embed(text)
     
     # Save embedding to product
+    # Convert array to pgvector format (string representation)
+    embedding_str = "[#{embedding.join(',')}]"
     product.update_columns(
-      embedding: embedding,
+      embedding: embedding_str,
       embedding_generated_at: Time.current
     )
     

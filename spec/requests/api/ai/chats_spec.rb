@@ -36,7 +36,7 @@ RSpec.describe 'Api::Ai::ChatsController', type: :request do
                description: 'Ensalada fresca con vegetales',
                price: 10.0,
                is_vegan: true,
-               embedding: [0.1] * 1536)
+               embedding: "[#{([0.1] * 1536).join(',')}]")
       end
       let!(:regular_product) do
         create(:product,
@@ -45,7 +45,7 @@ RSpec.describe 'Api::Ai::ChatsController', type: :request do
                description: 'Hamburguesa con carne',
                price: 15.0,
                is_vegan: false,
-               embedding: [0.5] * 1536)
+               embedding: "[#{([0.5] * 1536).join(',')}]")
       end
 
       before do

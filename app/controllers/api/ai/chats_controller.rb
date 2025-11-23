@@ -4,8 +4,8 @@ module Api
   module Ai
     # Controller for AI-powered chat interactions
     class ChatsController < ApplicationController
-      skip_before_action :verify_authenticity_token
-
+      skip_before_action :authorize
+      
       before_action :check_feature_enabled
 
       # POST /ai/chat

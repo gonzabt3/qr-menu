@@ -1,5 +1,5 @@
 class AddEmbeddingToProducts < ActiveRecord::Migration[7.1]
-  def change
+  def up
     # Enable pgvector extension if not already enabled
     enable_extension 'vector' unless extension_enabled?('vector')
     
@@ -9,8 +9,13 @@ class AddEmbeddingToProducts < ActiveRecord::Migration[7.1]
     # Add timestamp to track when embedding was generated
     add_column :products, :embedding_generated_at, :timestamptz
     
-    # Add HNSW index for fast vector similarity search
-    # HNSW (Hierarchical Navigable Small World) is optimized for nearest neighbor search
-    add_index :products, :embedding, using: :hnsw, opclass: :vector_cosine_ops
+    # Note: pgvector specialized indexes (ivfflat, hnsw) can be added later once products have embeddings
+    # For now, we'll rely on sequential scan which works fine for smaller datasets
+    # To add index later, run: CREATE INDEX ON products USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+  end
+  
+  def down
+    remove_column :products, :embedding_generated_at
+    remove_column :products, :embedding
   end
 end

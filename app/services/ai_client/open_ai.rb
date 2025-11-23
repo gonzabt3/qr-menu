@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # OpenAI provider implementation
-class AiClient::OpenAI
+class AiClient::OpenAi
   EMBEDDING_MODEL = 'text-embedding-ada-002'.freeze
   CHAT_MODEL = 'gpt-3.5-turbo'.freeze
 
@@ -81,12 +81,12 @@ class AiClient::OpenAI
 
   def log_info(message)
     return unless logging_enabled?
-    Rails.logger.info("[AiClient::OpenAI] #{message}")
+    Rails.logger.info("[AiClient::OpenAi] #{message}")
   end
 
   def log_error(message)
     return unless logging_enabled?
-    Rails.logger.error("[AiClient::OpenAI] #{message}")
+    Rails.logger.error("[AiClient::OpenAi] #{message}")
   end
 
   def logging_enabled?
