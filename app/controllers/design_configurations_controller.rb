@@ -16,10 +16,11 @@ class DesignConfigurationsController < ApplicationController
   def update
     design_config = @menu.get_design_configuration
     
-    if design_config.update_from_design_hash(design_params)
+    begin
+      design_config.update_from_design_hash(design_params)
       render json: design_config.to_design_hash
-    else
-      render json: design_config.errors, status: :unprocessable_entity
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { errors: design_config.errors.full_messages }, status: :unprocessable_entity
     end
   end
 

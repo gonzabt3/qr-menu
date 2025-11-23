@@ -343,6 +343,8 @@ GEM
       ffi (~> 1.12)
       logger
     securerandom (0.3.1)
+    shoulda-matchers (7.0.1)
+      activesupport (>= 7.1)
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
@@ -396,6 +398,7 @@ DEPENDENCIES
   rspec-rails
   rubocop
   ruby-vips
+  shoulda-matchers
   tinify
   tzinfo-data
   webmock

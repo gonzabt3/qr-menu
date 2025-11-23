@@ -57,18 +57,21 @@ class DesignConfiguration < ApplicationRecord
 
   # Actualizar desde hash del frontend
   def update_from_design_hash(design_hash)
-    update!(
-      primary_color: design_hash[:primaryColor] || design_hash["primaryColor"],
-      secondary_color: design_hash[:secondaryColor] || design_hash["secondaryColor"],
-      background_color: design_hash[:backgroundColor] || design_hash["backgroundColor"],
-      text_color: design_hash[:textColor] || design_hash["textColor"],
-      font: design_hash[:font] || design_hash["font"],
-      logo_url: design_hash[:logoUrl] || design_hash["logoUrl"],
-      show_whatsapp: design_hash[:showWhatsApp] || design_hash["showWhatsApp"],
-      show_instagram: design_hash[:showInstagram] || design_hash["showInstagram"],
-      show_phone: design_hash[:showPhone] || design_hash["showPhone"],
-      show_maps: design_hash[:showMaps] || design_hash["showMaps"],
-      show_restaurant_logo: design_hash[:showRestaurantLogo] || design_hash["showRestaurantLogo"]
-    )
+    update_attributes = {}
+    
+    # Solo actualizar los campos que vienen en el hash
+    update_attributes[:primary_color] = design_hash[:primaryColor] || design_hash["primaryColor"] if design_hash.key?(:primaryColor) || design_hash.key?("primaryColor")
+    update_attributes[:secondary_color] = design_hash[:secondaryColor] || design_hash["secondaryColor"] if design_hash.key?(:secondaryColor) || design_hash.key?("secondaryColor") 
+    update_attributes[:background_color] = design_hash[:backgroundColor] || design_hash["backgroundColor"] if design_hash.key?(:backgroundColor) || design_hash.key?("backgroundColor")
+    update_attributes[:text_color] = design_hash[:textColor] || design_hash["textColor"] if design_hash.key?(:textColor) || design_hash.key?("textColor")
+    update_attributes[:font] = design_hash[:font] || design_hash["font"] if design_hash.key?(:font) || design_hash.key?("font")
+    update_attributes[:logo_url] = design_hash[:logoUrl] || design_hash["logoUrl"] if design_hash.key?(:logoUrl) || design_hash.key?("logoUrl")
+    update_attributes[:show_whatsapp] = design_hash[:showWhatsApp] || design_hash["showWhatsApp"] if design_hash.key?(:showWhatsApp) || design_hash.key?("showWhatsApp")
+    update_attributes[:show_instagram] = design_hash[:showInstagram] || design_hash["showInstagram"] if design_hash.key?(:showInstagram) || design_hash.key?("showInstagram")
+    update_attributes[:show_phone] = design_hash[:showPhone] || design_hash["showPhone"] if design_hash.key?(:showPhone) || design_hash.key?("showPhone")
+    update_attributes[:show_maps] = design_hash[:showMaps] || design_hash["showMaps"] if design_hash.key?(:showMaps) || design_hash.key?("showMaps")
+    update_attributes[:show_restaurant_logo] = design_hash[:showRestaurantLogo] || design_hash["showRestaurantLogo"] if design_hash.key?(:showRestaurantLogo) || design_hash.key?("showRestaurantLogo")
+
+    update!(update_attributes)
   end
 end
