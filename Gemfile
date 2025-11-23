@@ -28,7 +28,16 @@ gem 'rqrcode_png'
 # gem "jbuilder"
 
 # Use Redis adapter to run Action Cable in production
-# gem "redis", ">= 4.0.1"
+gem 'redis', '>= 4.0.1'
+
+# Sidekiq for background jobs
+gem 'sidekiq', '~> 7.0'
+
+# pgvector for embeddings
+gem 'pgvector'
+
+# ruby-openai for AI API interactions (supports OpenAI and compatible APIs like DeepSeek)
+gem 'ruby-openai', '~> 7.0'
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
