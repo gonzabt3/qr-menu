@@ -5,7 +5,7 @@ module Api
     # Controller for AI-powered chat interactions
     class ChatsController < ApplicationController
       skip_before_action :authorize
-      
+
       before_action :check_feature_enabled
 
       # POST /ai/chat
@@ -26,22 +26,22 @@ module Api
 
         # Generate embedding for the user query
         query_embedding = AiClient.embed(user_query)
-        
+
         # Find similar products using vector similarity search
         # Using cosine distance operator (<->) for similarity
         similar_products = find_similar_products(query_embedding, limit: 5)
-        
+
         log_info("Found #{similar_products.count} similar products")
 
         # Build context from similar products
         context = build_context(similar_products)
-        
+
         # Build prompt for LLM
         prompt = build_prompt(user_query, context, locale)
-        
+
         # Generate answer using LLM
         answer = AiClient.complete(prompt, temperature: 0.7, max_tokens: 500)
-        
+
         # Prepare references
         references = similar_products.map do |product|
           {
@@ -53,7 +53,7 @@ module Api
 
         elapsed_time = Time.current - start_time
         log_info("Generated response in #{elapsed_time.round(2)}s")
-        
+
         # Log metadata if enabled
         log_metadata(session_id, user_query, references, elapsed_time) if logging_enabled?
 
@@ -65,8 +65,8 @@ module Api
       rescue StandardError => e
         log_error("Error processing chat: #{e.message}")
         log_error(e.backtrace.join("\n")) if logging_enabled?
-        
-        render json: { 
+
+        render json: {
           error: 'An error occurred while processing your request',
           details: Rails.env.development? ? e.message : nil
         }, status: :internal_server_error
@@ -75,9 +75,9 @@ module Api
       private
 
       def check_feature_enabled
-        unless ENV['FEATURE_AI_CHAT_ENABLED'] == 'true'
-          render json: { error: 'AI chat feature is not enabled' }, status: :not_found
-        end
+        return if ENV['FEATURE_AI_CHAT_ENABLED'] == 'true'
+
+        render json: { error: 'AI chat feature is not enabled' }, status: :not_found
       end
 
       # Find products similar to the query embedding
@@ -86,11 +86,11 @@ module Api
         # Returns products ordered by similarity (lower distance = more similar)
         # Convert array embedding to pgvector format: [1,2,3]
         embedding_str = if query_embedding.is_a?(Array)
-                         "[#{query_embedding.join(',')}]"
-                       else
-                         query_embedding
-                       end
-        
+                          "[#{query_embedding.join(',')}]"
+                        else
+                          query_embedding
+                        end
+
         Product.select(
           'products.*',
           "embedding <-> '#{embedding_str}' AS similarity_score"
@@ -108,32 +108,32 @@ module Api
           context += "#{index + 1}. #{product.name}"
           context += " - #{product.description}" if product.description.present?
           context += " - Precio: $#{product.price}"
-          
+
           dietary = []
           dietary << 'vegano' if product.is_vegan
           dietary << 'apto para celíacos' if product.is_celiac
           context += " (#{dietary.join(', ')})" if dietary.any?
-          
+
           context += "\n"
         end
-        
+
         context
       end
 
       def build_prompt(user_query, context, locale)
         system_message = if locale == 'es'
-                          'Eres un asistente virtual amable y servicial de un restaurante. ' \
-                          'Tu trabajo es ayudar a los clientes a elegir platos del menú basándote ' \
-                          'en la información proporcionada. Responde de manera concisa, amigable y ' \
-                          'en español. Si la pregunta no está relacionada con el menú, menciona ' \
-                          'amablemente que solo puedes ayudar con consultas sobre el menú.'
-                        else
-                          'You are a friendly and helpful virtual assistant for a restaurant. ' \
-                          'Your job is to help customers choose dishes from the menu based on ' \
-                          'the provided information. Respond concisely and friendly. If the ' \
-                          'question is not related to the menu, politely mention that you can ' \
-                          'only help with menu-related queries.'
-                        end
+                           'Eres un asistente virtual amable y servicial de un restaurante. ' \
+                           'Tu trabajo es ayudar a los clientes a elegir platos del menú basándote ' \
+                           'en la información proporcionada. Responde de manera concisa, amigable y ' \
+                           'en español. Si la pregunta no está relacionada con el menú, menciona ' \
+                           'amablemente que solo puedes ayudar con consultas sobre el menú.'
+                         else
+                           'You are a friendly and helpful virtual assistant for a restaurant. ' \
+                           'Your job is to help customers choose dishes from the menu based on ' \
+                           'the provided information. Respond concisely and friendly. If the ' \
+                           'question is not related to the menu, politely mention that you can ' \
+                           'only help with menu-related queries.'
+                         end
 
         [
           { role: 'system', content: system_message },
@@ -150,17 +150,19 @@ module Api
           elapsed_time: elapsed_time.round(3),
           timestamp: Time.current.iso8601
         }
-        
+
         Rails.logger.info("[AiChat] Metadata: #{metadata.to_json}")
       end
 
       def log_info(message)
         return unless logging_enabled?
+
         Rails.logger.info("[Api::Ai::ChatsController] #{message}")
       end
 
       def log_error(message)
         return unless logging_enabled?
+
         Rails.logger.error("[Api::Ai::ChatsController] #{message}")
       end
 
