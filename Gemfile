@@ -24,6 +24,12 @@ gem 'tinify'
 gem 'rqrcode'
 gem 'rqrcode_png'
 
+# AI and Vector Search
+gem 'pgvector'
+gem 'ruby-openai'
+gem 'sidekiq'
+gem 'redis'
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 # gem "jbuilder"
 

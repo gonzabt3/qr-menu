@@ -33,6 +33,11 @@ Rails.application.routes.draw do
 
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
+    
+    # AI Chat endpoint
+    namespace :ai do
+      post 'chat', to: 'chats#create'
+    end
   end
 
   namespace :qr do
