@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
+ActiveRecord::Schema[7.1].define(version: 0) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+  enable_extension "vector"
 
   create_table "feedbacks", force: :cascade do |t|
     t.text "message", null: false
@@ -30,19 +31,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
     t.datetime "updated_at", null: false
     t.boolean "favorite", default: false
     t.index ["restaurant_id"], name: "index_menus_on_restaurant_id"
-  end
-
-  create_table "products", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.decimal "price"
-    t.bigint "section_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.string "image_url"
-    t.boolean "is_vegan", default: false
-    t.boolean "is_celiac", default: false
-    t.index ["section_id"], name: "index_products_on_section_id"
   end
 
   create_table "restaurants", force: :cascade do |t|
@@ -89,7 +77,4 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
 
   add_foreign_key "feedbacks", "users"
   add_foreign_key "menus", "restaurants"
-  add_foreign_key "products", "sections"
-  add_foreign_key "restaurants", "users"
-  add_foreign_key "sections", "menus"
 end
