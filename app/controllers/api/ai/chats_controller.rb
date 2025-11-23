@@ -2,9 +2,12 @@
 module Api
   module Ai
     class ChatsController < ApplicationController
-      # Skip authentication for AI chat endpoint
+      # Skip authentication for AI chat endpoint - this is a public API
       skip_before_action :authorize_request, raise: false
-      # Skip CSRF for API endpoint
+      
+      # Skip CSRF for API endpoint - intentional for public API access
+      # This endpoint is designed to be called from external clients (mobile apps, web)
+      # and does not modify user-specific data or perform privileged operations
       skip_before_action :verify_authenticity_token, raise: false
 
       before_action :check_feature_flag
