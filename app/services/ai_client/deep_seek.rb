@@ -3,7 +3,7 @@
 # DeepSeek AI provider implementation
 # DeepSeek API is compatible with OpenAI's API format
 module AiClient
-  class Deepseak
+  class DeepSeek
     EMBEDDING_MODEL = 'deepseek-ai/deepseek-chat'
     CHAT_MODEL = 'deepseek-chat'
     BASE_URL = 'https://api.deepseek.com'
@@ -54,7 +54,8 @@ module AiClient
     # @param options [Hash] Options like temperature, max_tokens
     # @return [String] Generated text
     def complete(prompt, options = {})
-      log_info("Generating completion (prompt: #{prompt.length} chars)")
+      prompt_desc = prompt.is_a?(Array) ? "#{prompt.size} messages" : "#{prompt.length} chars"
+      log_info("Generating completion (prompt: #{prompt_desc})")
 
       client = OpenAI::Client.new(
         access_token: @api_key,
@@ -89,13 +90,13 @@ module AiClient
     def log_info(message)
       return unless logging_enabled?
 
-      Rails.logger.info("[AiClient::Deepseak] #{message}")
+      Rails.logger.info("[AiClient::DeepSeek] #{message}")
     end
 
     def log_error(message)
       return unless logging_enabled?
 
-      Rails.logger.error("[AiClient::Deepseak] #{message}")
+      Rails.logger.error("[AiClient::DeepSeek] #{message}")
     end
 
     def logging_enabled?

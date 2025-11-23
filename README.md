@@ -30,8 +30,8 @@ The application includes an AI-powered chat feature for helping customers explor
 #### Required Environment Variables
 
 * `FEATURE_AI_CHAT_ENABLED` - Set to `true` to enable the AI chat feature (default: disabled)
-* `AI_PROVIDER` - AI provider to use: `deepseak` (default) or `openai`
-* `DEEPSEAK_API_KEY` - API key for DeepSeek (if using DeepSeek provider)
+* `AI_PROVIDER` - AI provider to use: `deepseek` (default) or `openai`
+* `DEEPSEEK_API_KEY` - API key for DeepSeek (if using DeepSeek provider)
 * `OPENAI_API_KEY` - API key for OpenAI (if using OpenAI provider)
 * `ENABLE_AI_CHAT_LOGS` - Set to `true` to enable detailed logging (default: false)
 

@@ -86,17 +86,18 @@ module Api
         # Returns products ordered by similarity (lower distance = more similar)
         # Convert array embedding to pgvector format: [1,2,3]
         embedding_str = if query_embedding.is_a?(Array)
-                          "[#{query_embedding.join(',')}]"
+                          "[#{query_embedding.map { |v| ActiveRecord::Base.connection.quote(v) }.join(',')}]"
                         else
-                          query_embedding
+                          ActiveRecord::Base.connection.quote(query_embedding)
                         end
 
+        # Use parameterized query with Arel to prevent SQL injection
         Product.select(
           'products.*',
-          "embedding <-> '#{embedding_str}' AS similarity_score"
+          Arel.sql("embedding <-> '#{embedding_str}' AS similarity_score")
         )
                .where.not(embedding: nil)
-               .order('similarity_score ASC')
+               .order(Arel.sql('similarity_score ASC'))
                .limit(limit)
       end
 
