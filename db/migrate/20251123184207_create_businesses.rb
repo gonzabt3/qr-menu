@@ -13,7 +13,7 @@ class CreateBusinesses < ActiveRecord::Migration[7.0]
       t.boolean :has_menu, default: false
       t.jsonb :menu_urls, default: []
       t.jsonb :raw_response, default: {}
-      t.string :status, default: "new"
+      t.string :status, default: "pending"
       t.timestamps
     end
   end

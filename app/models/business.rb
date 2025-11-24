@@ -1,7 +1,7 @@
 class Business < ApplicationRecord
   validates :place_id, presence: true, uniqueness: true
 
-  enum status: { new: "new", scanned: "scanned", failed: "failed" }
+  enum status: { pending: "pending", scanned: "scanned", failed: "failed" }
 
   # Helper to add menu urls
   def add_menu_urls(urls)

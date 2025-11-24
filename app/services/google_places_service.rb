@@ -28,8 +28,16 @@ class GooglePlacesService
       params[:pagetoken] = next_page_token if next_page_token.present?
       uri.query = URI.encode_www_form(params)
 
+      Rails.logger.info "Making Google Places API request: #{uri}"
       res = http_get(uri)
       parsed = JSON.parse(res.body)
+      
+      Rails.logger.info "Google Places API status: #{parsed['status']}"
+      if parsed['status'] != 'OK'
+        Rails.logger.warn "Google Places API error: #{parsed['status']} - #{parsed['error_message']}"
+      end
+      Rails.logger.info "Google Places API returned #{(parsed['results'] || []).length} results for this page"
+      
       results += parsed["results"] || []
       next_page_token = parsed["next_page_token"]
       break unless next_page_token.present?

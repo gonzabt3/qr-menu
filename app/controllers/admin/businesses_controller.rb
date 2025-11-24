@@ -20,10 +20,18 @@ module Admin
       service = GooglePlacesService.new
       results = service.nearby_search(lat: lat, lng: lng, radius: radius, keyword: keyword)
 
+      Rails.logger.info "Google Places API returned #{results.count} results"
+      Rails.logger.info "Results: #{results.map { |r| r['name'] }.join(', ')}" if results.any?
+
       created = []
       results.each do |place|
         place_id = place['place_id']
-        next if Business.exists?(place_id: place_id)
+        if Business.exists?(place_id: place_id)
+          Rails.logger.info "Skipping existing business: #{place['name']} (#{place_id})"
+          next
+        end
+
+        Rails.logger.info "Creating business: #{place['name']} (#{place_id})"
 
         details = service.place_details(place_id)
         business = Business.create!(

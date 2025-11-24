@@ -385,6 +385,7 @@ DEPENDENCIES
   image_processing
   jwt
   mercadopago-sdk
+  nokogiri
   omniauth-auth0
   pg (~> 1.1)
   puma (>= 5.0)
