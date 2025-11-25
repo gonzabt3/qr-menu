@@ -12,12 +12,16 @@ module Metrics
         return
       end
 
-      # Extract user_id from current_user if authenticated, otherwise use session_identifier
+      # Build tap params ensuring either user_id or session_identifier is used, not both
       tap_params = {
-        product_id: product.id,
-        user_id: extract_user_id,
-        session_identifier: product_tap_params[:session_identifier]
+        product_id: product.id
       }
+      
+      if product_tap_params[:user_id].present?
+        tap_params[:user_id] = product_tap_params[:user_id]
+      else
+        tap_params[:session_identifier] = product_tap_params[:session_identifier]
+      end
 
       product_tap = ProductTap.new(tap_params)
 
@@ -48,11 +52,6 @@ module Metrics
 
     def product_tap_params
       params.permit(:product_id, :session_identifier, :user_id)
-    end
-
-    def extract_user_id
-      # Since authorization is skipped, user_id must be provided in params
-      product_tap_params[:user_id]
     end
 
     def aggregate_taps_by_product

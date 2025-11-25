@@ -4,7 +4,7 @@ class ProductTap < ApplicationRecord
   belongs_to :user, optional: true
 
   validates :product_id, presence: true
-  validates :session_identifier, presence: true, unless: :user_id?
+  validates :session_identifier, presence: true, unless: -> { user_id.present? }
 
   # Scopes for analytics
   scope :recent, -> { order(created_at: :desc) }
