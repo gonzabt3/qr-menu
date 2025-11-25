@@ -110,12 +110,6 @@ RSpec.describe 'Metrics::ProductTaps', type: :request do
     let!(:product_tap2) { create(:product_tap, product: product, session_identifier: 'session-2') }
     let!(:product_tap3) { create(:product_tap, product: product, user: user) }
 
-    before do
-      product_tap1
-      product_tap2
-      product_tap3
-    end
-
     it 'returns success status' do
       get '/metrics/product-taps'
       expect(response).to have_http_status(:ok)
