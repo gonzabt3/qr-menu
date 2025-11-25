@@ -137,7 +137,135 @@ curl -X GET http://localhost:3000/api/feedbacks \
 curl -X GET "http://localhost:3000/api/feedbacks?secret=your_secret_here"
 ```
 
+### Product Tap Metrics API
+
+Track and analyze product engagement through tap events.
+
+#### Record Product Tap
+
+Record when a user views/taps on a product. This endpoint does not require authentication.
+
+**Endpoint:** `POST /metrics/product-tap`
+
+**Request Body:**
+```json
+{
+  "product_id": 123,
+  "session_identifier": "unique-session-id"
+}
+```
+
+Or with authenticated user:
+```json
+{
+  "product_id": 123,
+  "user_id": 456
+}
+```
+
+**Parameters:**
+- `product_id` (required) - ID of the product being tapped
+- `session_identifier` (optional) - Unique session identifier for anonymous users
+- `user_id` (optional) - User ID for authenticated users
+
+**Note:** Either `session_identifier` or `user_id` must be provided.
+
+**Success Response (201 Created):**
+```json
+{
+  "message": "Product tap recorded successfully",
+  "tap": {
+    "id": 1,
+    "product_id": 123,
+    "user_id": null,
+    "session_identifier": "unique-session-id",
+    "created_at": "2024-11-25T22:30:00.000Z"
+  }
+}
+```
+
+**Error Responses:**
+
+- `404 Not Found` - Product not found
+```json
+{
+  "error": "Product not found"
+}
+```
+
+- `422 Unprocessable Entity` - Validation error
+```json
+{
+  "errors": ["Session identifier can't be blank"]
+}
+```
+
+**Example using curl:**
+```bash
+curl -X POST http://localhost:3000/metrics/product-tap \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product_id": 123,
+    "session_identifier": "abc-123-xyz"
+  }'
+```
+
+#### Get Product Tap Dashboard
+
+Retrieve aggregated metrics and analytics for product taps. This endpoint does not require authentication.
+
+**Endpoint:** `GET /metrics/product-taps`
+
+**Success Response (200 OK):**
+```json
+{
+  "total_taps": 150,
+  "taps_by_product": [
+    {
+      "product_id": 123,
+      "product_name": "Pizza Margherita",
+      "count": 45
+    },
+    {
+      "product_id": 124,
+      "product_name": "Caesar Salad",
+      "count": 30
+    }
+  ],
+  "recent_taps": [
+    {
+      "id": 150,
+      "product_id": 123,
+      "product_name": "Pizza Margherita",
+      "user_id": 5,
+      "session_identifier": null,
+      "created_at": "2024-11-25T22:30:00.000Z"
+    }
+  ],
+  "top_products": [
+    {
+      "product_id": 123,
+      "product_name": "Pizza Margherita",
+      "tap_count": 45
+    }
+  ]
+}
+```
+
+**Response Fields:**
+- `total_taps` - Total number of tap events recorded
+- `taps_by_product` - Array of tap counts grouped by product (ordered by count descending)
+- `recent_taps` - Array of the 50 most recent tap events (ordered by date descending)
+- `top_products` - Array of top 10 most-tapped products
+
+**Example using curl:**
+```bash
+curl -X GET http://localhost:3000/metrics/product-taps
+```
+
 ## Data Storage
+
+### Feedback Table
 
 Feedback data is stored in the PostgreSQL database in the `feedbacks` table with the following schema:
 
@@ -145,6 +273,19 @@ Feedback data is stored in the PostgreSQL database in the `feedbacks` table with
 - `message` (TEXT) - Feedback message content
 - `created_at` (TIMESTAMP) - When the feedback was created
 - `updated_at` (TIMESTAMP) - When the feedback was last updated
+
+### Product Taps Table
+
+Product tap events are stored in the `product_taps` table with the following schema:
+
+- `id` (BIGINT) - Primary key (auto-incremented)
+- `product_id` (BIGINT) - Foreign key to products table (required)
+- `user_id` (BIGINT) - Foreign key to users table (optional, for authenticated users)
+- `session_identifier` (STRING) - Session identifier (optional, for anonymous users)
+- `created_at` (TIMESTAMP) - When the tap event occurred
+- `updated_at` (TIMESTAMP) - When the record was last updated
+
+Indexes are created on `product_id`, `user_id`, `session_identifier`, and `created_at` for efficient querying.
 
 ## Services
 
