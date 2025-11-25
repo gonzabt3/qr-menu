@@ -51,9 +51,7 @@ module Metrics
     end
 
     def extract_user_id
-      # Try to get user_id from authenticated user if available
-      return @current_user.id if @current_user.present?
-      # Otherwise, check if user_id is provided in params (for authenticated scenarios)
+      # Since authorization is skipped, user_id must be provided in params
       product_tap_params[:user_id]
     end
 
