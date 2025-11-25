@@ -38,4 +38,9 @@ Rails.application.routes.draw do
   namespace :qr do
     get 'wifi', to: 'wifi#show'
   end
+
+  namespace :metrics do
+    post 'product-tap', to: 'product_taps#create'
+    get 'product-taps', to: 'product_taps#dashboard'
+  end
 end
