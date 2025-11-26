@@ -10,9 +10,28 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
+ActiveRecord::Schema[7.1].define(version: 2025_11_23_184207) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "businesses", force: :cascade do |t|
+    t.string "place_id", null: false
+    t.string "name"
+    t.string "address"
+    t.decimal "lat", precision: 10, scale: 6
+    t.decimal "lng", precision: 10, scale: 6
+    t.string "phone"
+    t.string "website"
+    t.string "google_place_url"
+    t.string "instagram"
+    t.boolean "has_menu", default: false
+    t.jsonb "menu_urls", default: []
+    t.jsonb "raw_response", default: {}
+    t.string "status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["place_id"], name: "index_businesses_on_place_id", unique: true
+  end
 
   create_table "feedbacks", force: :cascade do |t|
     t.text "message", null: false
@@ -56,7 +75,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_21_201816) do
     t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "logo_url"
     t.index ["user_id"], name: "index_restaurants_on_user_id"
   end
 

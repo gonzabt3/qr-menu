@@ -38,4 +38,8 @@ Rails.application.routes.draw do
   namespace :qr do
     get 'wifi', to: 'wifi#show'
   end
+
+  namespace :admin do
+    resources :businesses, only: [:index, :create]
+  end
 end
