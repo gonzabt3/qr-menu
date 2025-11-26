@@ -4,7 +4,10 @@ module Admin
 
     def index
       @businesses = Business.order(created_at: :desc).limit(200)
-      render json: @businesses.as_json(only: [:id, :name, :address, :phone, :website, :instagram, :has_menu, :menu_urls, :status])
+      render json: @businesses.as_json(
+        only: [:id, :name, :address, :phone, :website, :instagram, :has_menu, :menu_urls, :status, :created_at],
+        methods: [:google_place_url]
+      )
     end
 
     def create
