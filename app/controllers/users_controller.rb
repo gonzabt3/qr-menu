@@ -4,6 +4,22 @@ require 'mercadopago'
 class UsersController < ApplicationController
   before_action :authorize
 
+  # GET /users
+  def index
+    return unless validate_admin_access
+    
+    users = User.order(created_at: :desc).limit(1000)
+    render json: users.map { |u|
+      {
+        id: u.id,
+        email: u.email,
+        name: u.name,
+        role: determine_user_role(u),
+        createdAt: u.created_at.iso8601
+      }
+    }, status: :ok
+  end
+
   def create
     user = User.new(user_params)
     if user.save
@@ -84,6 +100,17 @@ class UsersController < ApplicationController
   end
 
   private
+
+  def determine_user_role(user)
+    # Verificar si el usuario es admin basado en algún campo o lógica
+    # Por ahora, vamos a usar una lógica simple
+    admin_emails = ENV['ADMIN_EMAILS']&.split(',')&.map(&:strip)&.map(&:downcase) || []
+    if admin_emails.include?(user.email&.downcase)
+      'admin'
+    else
+      'user'
+    end
+  end
 
   def user_params
     params.require(:user).permit(:auth0_id, :email, :name, :surname, :picture, :phone, :address, :birthday, :first_time)

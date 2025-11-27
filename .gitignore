@@ -6,6 +6,7 @@
 
 # Ignore bundler config.
 /.bundle
+/vendor/bundle
 
 # Ignore all environment files (except templates).
 /.env*
@@ -31,6 +32,15 @@
 
 # Ignore master key for decrypting credentials and more.
 /config/master.key
+
+# Next.js Frontend
+/frontend/.next/
+/frontend/out/
+/frontend/node_modules/
+/frontend/.env.local
+/frontend/.env.production.local
+/frontend/.env.development.local
+/frontend/.env.test.local
 .byebug_history
 
 # Ignore AWS credentials

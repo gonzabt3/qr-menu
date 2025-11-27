@@ -48,6 +48,20 @@ module Secured
     render json: INSUFFICIENT_PERMISSIONS, status: :forbidden
   end
 
+  def validate_admin_access
+    admin_emails = ENV['ADMIN_EMAILS']&.split(',')&.map(&:strip)&.map(&:downcase) || []
+    user_email = @current_user&.email&.downcase
+    
+    unless admin_emails.include?(user_email)
+      render json: { 
+        error: 'admin_access_required',
+        message: 'Admin access required for this operation' 
+      }, status: :forbidden and return false
+    end
+    
+    true
+  end
+
   def current_user
     @current_user
   end

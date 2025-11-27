@@ -9,7 +9,7 @@ Rails.application.routes.draw do
   get 'menus/by_name/:name', to: 'menus#show_by_name', as: 'menus_by_name'
   get 'menus/by_restaurant_id/:id', to: 'menus#show_by_restaurant_id', as: 'menus_by_restaurant_id'
 
-  resources :users, only: %i[create update] do
+  resources :users, only: %i[index create update] do
     post 'subscribe', to: 'users#subscribe', on: :member, constraints: { id: /.*/ }
     post 'unsubscribe', to: 'users#unsubscribe', on: :member, constraints: { id: /.*/ }
     get 'restaurants', to: 'restaurants#index_by_email', on: :member, constraints: { id: /.*/ }
@@ -37,5 +37,9 @@ Rails.application.routes.draw do
 
   namespace :qr do
     get 'wifi', to: 'wifi#show'
+  end
+
+  namespace :admin do
+    resources :businesses, only: [:index, :create]
   end
 end
