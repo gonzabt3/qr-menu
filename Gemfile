@@ -8,6 +8,9 @@ gem 'rails', '~> 7.1.3', '>= 7.1.3.2'
 # Use postgresql as the database for Active Record
 gem 'pg', '~> 1.1'
 
+# Vector embeddings support for AI features
+gem 'pgvector'
+
 # Use the Puma web server [https://github.com/puma/puma]
 gem 'aws-sdk-s3'
 gem 'byebug'

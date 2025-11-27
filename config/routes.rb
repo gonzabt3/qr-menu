@@ -31,6 +31,9 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: [:create, :index]
 
+  # AI Chat endpoint
+  post 'chat', to: 'chat#create'
+
   namespace :api do
     post 'mercado_pago', to: 'mercado_pago#info'
   end

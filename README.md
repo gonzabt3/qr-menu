@@ -152,6 +152,143 @@ Feedback data is stored in the PostgreSQL database in the `feedbacks` table with
 * User feedback collection
 * MercadoPago payment integration
 * Auth0 authentication
+* **AI-powered chat with semantic search** (new)
+
+## AI Chat Feature
+
+This application includes an AI-powered chat feature that uses vector embeddings and RAG (Retrieval Augmented Generation) to help customers find menu items and answer questions about the menu.
+
+### Prerequisites
+
+1. **PostgreSQL with pgvector extension**
+   ```sql
+   CREATE EXTENSION IF NOT EXISTS vector;
+   ```
+
+2. **AI Provider API Key**
+   - For DeepSeek (default): Set `DEEPSEEK_API_KEY`
+   - For OpenAI: Set `OPENAI_API_KEY` and `AI_PROVIDER=openai`
+
+### Environment Variables
+
+Add these to your `.env` file:
+
+```bash
+# AI Configuration
+AI_PROVIDER=deepseek              # Options: 'deepseek' (default) or 'openai'
+DEEPSEEK_API_KEY=your_key_here   # Required if using DeepSeek
+OPENAI_API_KEY=your_key_here     # Required if using OpenAI
+```
+
+### Setup Instructions
+
+1. **Install dependencies**
+   ```bash
+   bundle install
+   ```
+
+2. **Run migrations**
+   ```bash
+   rails db:migrate
+   ```
+   This will:
+   - Enable the pgvector extension
+   - Add embedding column to products table
+   - Create vector similarity search index
+
+3. **Generate embeddings for existing products**
+   ```bash
+   rails embeddings:backfill
+   ```
+   This enqueues background jobs to generate embeddings for all products.
+
+4. **Check embedding status**
+   ```bash
+   rails embeddings:status
+   ```
+
+### How It Works
+
+1. **Automatic Embedding Generation**: When a product is created or updated, an embedding is automatically generated from its name, description, dietary attributes, and price.
+
+2. **Vector Search**: User queries are converted to embeddings and compared against product embeddings using cosine similarity.
+
+3. **RAG Response**: The most similar products are used as context for an AI model to generate natural, helpful responses.
+
+### API Endpoint
+
+**POST /chat**
+
+Request body:
+```json
+{
+  "user_query": "¿Tienen opciones veganas?",
+  "menu_id": 1,
+  "locale": "es",
+  "top_k": 5
+}
+```
+
+Response:
+```json
+{
+  "answer": "Sí, tenemos varias opciones veganas...",
+  "references": [
+    {
+      "product_id": 42,
+      "name": "Ensalada Mediterránea",
+      "description": "Ensalada fresca con...",
+      "price": 12.50,
+      "similarity_score": 0.8234,
+      "is_vegan": true,
+      "is_celiac": false
+    }
+  ]
+}
+```
+
+### Rake Tasks
+
+- `rails embeddings:backfill` - Generate embeddings for all products
+- `rails embeddings:status` - Show current embedding status
+- `rails embeddings:regenerate[1,2,3]` - Regenerate specific products by ID
+- `rails embeddings:clear` - Clear all embeddings (requires confirmation)
+
+### Testing the Chat Locally
+
+```bash
+curl -X POST http://localhost:3000/chat \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_query": "¿Qué platos vegetarianos tienen?",
+    "menu_id": 1
+  }'
+```
+
+### Background Jobs
+
+The application uses ActiveJob for asynchronous embedding generation. Make sure you have a job processor running:
+
+For development (inline processing):
+```ruby
+# config/environments/development.rb
+config.active_job.queue_adapter = :inline
+```
+
+For production with Sidekiq:
+```bash
+bundle exec sidekiq
+```
+
+### Switching AI Providers
+
+To switch from DeepSeek to OpenAI:
+```bash
+export AI_PROVIDER=openai
+export OPENAI_API_KEY=your_openai_key
+rails embeddings:clear  # Optional: clear existing embeddings
+rails embeddings:backfill
+```
 
 ## Admin Backoffice
 

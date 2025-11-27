@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :section do
-    name { "MyString" }
-    description { "MyText" }
-    menu { nil }
+    name { "Pizzas" }
+    description { "Nuestras deliciosas pizzas" }
+    association :menu
   end
 end
