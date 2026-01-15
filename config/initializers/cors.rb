@@ -7,13 +7,23 @@
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    origins *ENV['CORS_ALLOWED_ORIGINS'].split(',')
-    puts "CORS allowed origins: #{ENV['CORS_ALLOWED_ORIGINS']}"
-    #origins 'http://localhost:3001'
-    #origins ENV['CORS_ALLOWED_ORIGINS']
-    resource "*",
-      headers: :any,
-      methods: [:get, :post, :put, :patch, :delete, :options, :head],
-      credentials: true
+    # In production, CORS_ALLOWED_ORIGINS must be set explicitly
+    # In development, default to localhost
+    if Rails.env.production?
+      # Require CORS_ALLOWED_ORIGINS in production for security
+      cors_origins = ENV.fetch('CORS_ALLOWED_ORIGINS') do
+        raise 'CORS_ALLOWED_ORIGINS environment variable must be set in production'
+      end
+      origins(*cors_origins.split(',').map(&:strip))
+    else
+      # Development default
+      cors_origins = ENV.fetch('CORS_ALLOWED_ORIGINS', 'http://localhost:3001')
+      origins(*cors_origins.split(',').map(&:strip))
+    end
+
+    resource '*',
+             headers: :any,
+             methods: %i[get post put patch delete options head],
+             credentials: true
   end
 end
