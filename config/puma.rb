@@ -3,7 +3,20 @@
 # about methods provided by the DSL, see https://puma.io/puma/Puma/DSL.html.
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-port ENV.fetch('PORT') { 3000 }
+port_number = ENV.fetch('PORT') { 3000 }
+puts '============================================'
+puts '🚀 Puma Configuration Debug:'
+puts "   PORT environment variable: #{ENV['PORT']}"
+puts "   Using port: #{port_number}"
+puts "   RAILS_ENV: #{ENV.fetch('RAILS_ENV', 'development')}"
+puts '============================================'
+
+port port_number
+
+# Bind to all interfaces (0.0.0.0) instead of just localhost (required for Railway/Docker)
+bind_address = "tcp://0.0.0.0:#{port_number}"
+puts "🌐 Binding to: #{bind_address}"
+bind bind_address
 
 # Specifies the `environment` that Puma will run in.
 environment ENV.fetch('RAILS_ENV') { 'development' }
