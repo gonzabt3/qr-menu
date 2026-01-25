@@ -7,13 +7,14 @@ class UsersController < ApplicationController
   # GET /users
   def index
     return unless validate_admin_access
-    
+
     users = User.order(created_at: :desc).limit(1000)
     render json: users.map { |u|
       {
         id: u.id,
         email: u.email,
         name: u.name,
+        subscribed: u.subscribed,
         role: determine_user_role(u),
         createdAt: u.created_at.iso8601
       }
@@ -42,10 +43,18 @@ class UsersController < ApplicationController
   end
 
   def update
-    user = User.find_by(auth0_id: params[:id])
-    if user.update(user_params)
-      user.update({ first_time: false })
+    # Intentar encontrar por ID numérico primero, luego por auth0_id
+    user = if params[:id].to_i.to_s == params[:id]
+             User.find_by(id: params[:id])
+           else
+             User.find_by(auth0_id: params[:id])
+           end
+
+    if user&.update(user_params)
+      user.update({ first_time: false }) if params[:user][:first_time] == false
       render json: user, status: :ok
+    elsif user.nil?
+      render json: { error: 'User not found' }, status: :not_found
     else
       render json: user.errors, status: :unprocessable_entity
     end
@@ -113,6 +122,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:auth0_id, :email, :name, :surname, :picture, :phone, :address, :birthday, :first_time)
+    params.require(:user).permit(:auth0_id, :email, :name, :surname, :picture, :phone, :address, :birthday,
+                                 :first_time, :subscribed)
   end
 end
