@@ -26,7 +26,7 @@ class MenusController < ApplicationController
     if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
-        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name, restaurantPhone: restaurant.phone)
+        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurant_info(restaurant))
       else
         render json: { error: 'Menu not found' },
                status: :not_found
@@ -42,7 +42,7 @@ class MenusController < ApplicationController
     if restaurant && restaurant.user.subscribed
       @menu = restaurant.menus.includes(sections: :products).where(favorite: true).first || restaurant.menus.includes(sections: :products).first
       if @menu
-        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurantName: restaurant.name, restaurantPhone: restaurant.phone)
+        render json: @menu.as_json(include: { sections: { include: :products } }).merge(restaurant_info(restaurant))
       else
         render json: { error: 'Menu not found' },
                status: :not_found
@@ -107,5 +107,17 @@ class MenusController < ApplicationController
     return if @restaurant.user == current_user
 
     render json: { error: 'You are not authorized to perform this action' }, status: :forbidden
+  end
+
+  def restaurant_info(restaurant)
+    {
+      restaurantName: restaurant.name,
+      restaurantPhone: restaurant.phone,
+      restaurantAddress: restaurant.address,
+      restaurantInstagram: restaurant.instagram,
+      restaurantWebsite: restaurant.website,
+      restaurantDescription: restaurant.description,
+      restaurantLogo: restaurant.logo_url
+    }
   end
 end

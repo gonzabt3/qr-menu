@@ -28,6 +28,18 @@ RSpec.describe 'Menus', type: :request do
       expect(JSON.parse(response.body)['name']).to eq('Test Menu')
     end
 
+    it 'returns restaurant info in the response' do
+      get menus_by_name_path(name: 'test resto')
+      body = JSON.parse(response.body)
+      expect(body['restaurantName']).to eq(restaurant1.name)
+      expect(body['restaurantPhone']).to eq(restaurant1.phone)
+      expect(body['restaurantAddress']).to eq(restaurant1.address)
+      expect(body['restaurantInstagram']).to eq(restaurant1.instagram)
+      expect(body['restaurantWebsite']).to eq(restaurant1.website)
+      expect(body['restaurantDescription']).to eq(restaurant1.description)
+      expect(body).to have_key('restaurantLogo')
+    end
+
     it 'returns a not found response if menu does not exist' do
       get menus_by_name_path(name: 'Nonexistent Menu')
       expect(response).to have_http_status(:not_found)
